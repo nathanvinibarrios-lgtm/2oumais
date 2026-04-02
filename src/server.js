@@ -807,6 +807,18 @@ app.post("/api/zapier/lead", async (req, res) => {
   }
 });
 
+// ── Prospecção ────────────────────────────────────────────────────────────────
+app.post("/api/prospeccao/enviar", autenticado, async (req, res) => {
+  try {
+    const { fone, mensagem } = req.body;
+    if (!fone || !mensagem) return res.status(400).json({ erro: "fone e mensagem obrigatórios" });
+    await zapi.enviarMensagem(fone, mensagem);
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ erro: e.message });
+  }
+});
+
 // ── Agenda ────────────────────────────────────────────────────────────────────
 app.get("/api/agenda", autenticado, (_req, res) => res.json(lerAgenda()));
 
