@@ -688,7 +688,7 @@ app.get("/api/google/campanhas", autenticado, async (req, res) => {
   }
 });
 
-// ── WhatsApp ──────────────────────────────────────────────────────────────────
+// ── WhatsApp (Baileys — local) ────────────────────────────────────────────────
 const whatsapp = require("./whatsapp");
 
 app.get("/api/whatsapp/status", autenticado, (_req, res) => {
@@ -714,17 +714,42 @@ app.post("/api/whatsapp/desconectar", autenticado, async (_req, res) => {
 });
 
 app.get("/api/chat/:fone", autenticado, (_req, res) => {
-  const chats = whatsapp.lerChats();
+  const zapi = require("./zapi");
+  const chats = zapi.lerChats();
   res.json(chats[_req.params.fone] || []);
 });
 
 app.post("/api/chat/:fone", autenticado, async (req, res) => {
   try {
-    await whatsapp.enviarMensagem(req.params.fone, req.body.texto);
+    const zapi = require("./zapi");
+    await zapi.enviarMensagem(req.params.fone, req.body.texto);
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ erro: err.message });
   }
+});
+
+// ── Z-API (cloud WhatsApp) ────────────────────────────────────────────────────
+const zapi = require("./zapi");
+
+// Webhook — Z-API chama esta rota quando chega mensagem
+app.post("/api/zapi/webhook", async (req, res) => {
+  res.sendStatus(200); // responde rápido para Z-API não retentar
+  try {
+    await zapi.processarWebhook(req.body);
+  } catch (e) {
+    console.error("[ZAPI webhook]", e.message);
+  }
+});
+
+// Status e QR Code da instância Z-API
+app.get("/api/zapi/status", autenticado, async (_req, res) => {
+  res.json(await zapi.getStatus());
+});
+
+app.get("/api/zapi/qrcode", autenticado, async (_req, res) => {
+  const qr = await zapi.getQRCode();
+  res.json({ qr });
 });
 
 app.get("/api/funil/config", autenticado, (_req, res) => res.json(lerFunilConfig()));
