@@ -760,7 +760,11 @@ app.post("/api/funil/config", autenticado, (req, res) => {
 });
 
 // ── Zapier Lead Webhook ───────────────────────────────────────────────────────
-const MENSAGEM_BOAS_VINDAS = `Olá! Vi que você preencheu nosso formulário. Aqui é da 2oumais Marketing Digital! 😊\n\nPosso te ajudar com mais informações?`;
+function gerarMensagemBoasVindas(nome) {
+  const primeiroNome = (nome || "").split(" ")[0] || "";
+  const saudacao = primeiroNome ? `Olá, ${primeiroNome}! 👋` : `Olá! 👋`;
+  return `${saudacao} Aqui é da *2oumais Marketing Digital*!\n\nVi que você demonstrou interesse nos nossos serviços. Fico feliz em te atender! 😊\n\nMe conta: qual é o seu negócio e qual seu maior desafio com marketing hoje?`;
+}
 
 app.post("/api/zapier/lead", async (req, res) => {
   res.sendStatus(200);
@@ -792,7 +796,7 @@ app.post("/api/zapier/lead", async (req, res) => {
       if (telefone) {
         try {
           const zapi = require("./zapi");
-          await zapi.enviarMensagem(telefone, MENSAGEM_BOAS_VINDAS);
+          await zapi.enviarMensagem(telefone, gerarMensagemBoasVindas(nome));
           console.log(`[Zapier] ✓ Mensagem enviada para ${telefone}`);
         } catch (e) {
           console.error(`[Zapier] Erro ao enviar mensagem:`, e.message);
