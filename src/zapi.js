@@ -9,9 +9,11 @@ const { buscarCampanhas, pausarCampanhaPorNome, formatarCampanhasParaPrompt } = 
 
 // ── Config Z-API ──────────────────────────────────────────────────────────────
 
-const INSTANCE_ID = process.env.ZAPI_INSTANCE_ID;
-const TOKEN       = process.env.ZAPI_TOKEN;
-const BASE_URL    = `https://api.z-api.io/instances/${INSTANCE_ID}/token/${TOKEN}`;
+const INSTANCE_ID    = process.env.ZAPI_INSTANCE_ID;
+const TOKEN          = process.env.ZAPI_TOKEN;
+const CLIENT_TOKEN   = process.env.ZAPI_CLIENT_TOKEN;
+const BASE_URL       = `https://api.z-api.io/instances/${INSTANCE_ID}/token/${TOKEN}`;
+const HEADERS        = { "Client-Token": CLIENT_TOKEN };
 
 const client = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -72,7 +74,7 @@ async function enviarMensagem(fone, texto) {
   await axios.post(`${BASE_URL}/send-text`, {
     phone: foneFormatado,
     message: texto,
-  });
+  }, { headers: HEADERS });
   salvarMensagem(foneFormatado, "eu", texto);
 }
 
@@ -80,7 +82,7 @@ async function enviarMensagem(fone, texto) {
 
 async function getStatus() {
   try {
-    const r = await axios.get(`${BASE_URL}/status`);
+    const r = await axios.get(`${BASE_URL}/status`, { headers: HEADERS });
     return r.data;
   } catch (e) {
     return { error: e.message };
@@ -89,7 +91,7 @@ async function getStatus() {
 
 async function getQRCode() {
   try {
-    const r = await axios.get(`${BASE_URL}/qr-code/image`, { responseType: "arraybuffer" });
+    const r = await axios.get(`${BASE_URL}/qr-code/image`, { headers: HEADERS, responseType: "arraybuffer" });
     const base64 = Buffer.from(r.data).toString("base64");
     return `data:image/png;base64,${base64}`;
   } catch {
