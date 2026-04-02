@@ -721,12 +721,26 @@ app.get("/api/chat/:fone", autenticado, (_req, res) => {
 
 app.post("/api/chat/:fone", autenticado, async (req, res) => {
   try {
-    const zapi = require("./zapi");
-    await zapi.enviarMensagem(req.params.fone, req.body.texto);
+    await whatsapp.enviarMensagem(req.params.fone, req.body.texto);
+    // enviarMensagem já pausa o bot automaticamente
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ erro: err.message });
   }
+});
+
+app.get("/api/chat/:fone/bot-status", autenticado, (req, res) => {
+  res.json({ pausado: whatsapp.botPausado(req.params.fone) });
+});
+
+app.post("/api/chat/:fone/reativar-bot", autenticado, (req, res) => {
+  whatsapp.reativarBot(req.params.fone);
+  res.json({ ok: true });
+});
+
+app.post("/api/chat/:fone/pausar-bot", autenticado, (req, res) => {
+  whatsapp.pausarBot(req.params.fone);
+  res.json({ ok: true });
 });
 
 // ── Z-API (cloud WhatsApp) ────────────────────────────────────────────────────

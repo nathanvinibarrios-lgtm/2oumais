@@ -60,7 +60,8 @@ function adicionarLeadCRM(numero, nome, primeiraMensagem) {
 
 // ── Chat history ──────────────────────────────────────────────────────────────
 
-const CHATS_FILE = path.join(__dirname, "../data/chats.json");
+const CHATS_FILE    = path.join(__dirname, "../data/chats.json");
+const PAUSADOS_FILE = path.join(__dirname, "../data/bot-pausados.json");
 
 function lerChats() {
   try { if (fs.existsSync(CHATS_FILE)) return JSON.parse(fs.readFileSync(CHATS_FILE, "utf8")); } catch {}
@@ -71,10 +72,27 @@ function salvarMensagem(fone, de, texto) {
   const chats = lerChats();
   if (!chats[fone]) chats[fone] = [];
   chats[fone].push({ de, texto, ts: new Date().toISOString() });
-  // Mantém só as últimas 200 mensagens por contato
   if (chats[fone].length > 200) chats[fone] = chats[fone].slice(-200);
   fs.mkdirSync(path.dirname(CHATS_FILE), { recursive: true });
   fs.writeFileSync(CHATS_FILE, JSON.stringify(chats));
+}
+
+// Controle de pausas: quando você envia mensagem manualmente, o bot para naquele contato
+function lerPausados() {
+  try { if (fs.existsSync(PAUSADOS_FILE)) return JSON.parse(fs.readFileSync(PAUSADOS_FILE, "utf8")); } catch {}
+  return [];
+}
+function pausarBot(fone) {
+  const lista = lerPausados();
+  if (!lista.includes(fone)) { lista.push(fone); fs.mkdirSync(path.dirname(PAUSADOS_FILE), { recursive: true }); fs.writeFileSync(PAUSADOS_FILE, JSON.stringify(lista)); }
+}
+function reativarBot(fone) {
+  const lista = lerPausados().filter(f => f !== fone);
+  fs.mkdirSync(path.dirname(PAUSADOS_FILE), { recursive: true });
+  fs.writeFileSync(PAUSADOS_FILE, JSON.stringify(lista));
+}
+function botPausado(fone) {
+  return lerPausados().includes(fone);
 }
 
 async function enviarMensagem(fone, texto) {
@@ -82,6 +100,8 @@ async function enviarMensagem(fone, texto) {
   const jid = fone.includes("@") ? fone : `${fone}@s.whatsapp.net`;
   await sockGlobal.sendMessage(jid, { text: texto });
   salvarMensagem(fone, "eu", texto);
+  // Quando você envia manualmente pelo dashboard, pausa o bot nesse contato
+  pausarBot(fone.replace(/@.*$/, ""));
 }
 
 // ── Estado da conexão (exportado para o servidor) ─────────────────────────────
@@ -220,9 +240,14 @@ async function responder(numero, mensagem, systemPrompt, isDono = false) {
 
 // ── Lógica de roteamento ──────────────────────────────────────────────────────
 
+function eLeadCRM(fone) {
+  return lerCRMLocal().some(l => l.fone === fone);
+}
+
 function classificarMensagem(numero, texto) {
   const jid = `${OWNER_NUMBER}@s.whatsapp.net`;
   const isOwner = numero === jid || numero.endsWith("@lid");
+  const fone = numero.replace(/@.*$/, "");
 
   // 1. Dono usando prefixo "claude"
   if (OWNER_NUMBER && isOwner && texto.toLowerCase().startsWith(PREFIXO_DONO)) {
@@ -230,18 +255,23 @@ function classificarMensagem(numero, texto) {
     return { tipo: "dono", conteudo: pergunta || texto };
   }
 
-  // 2. Lead vindo do anúncio
-  if (texto.trim() === MENSAGEM_LEAD) {
-    return { tipo: "lead", conteudo: texto };
+  // 2. Bot pausado neste contato (você assumiu a conversa manualmente)
+  if (botPausado(fone)) {
+    return { tipo: "ignorar" };
   }
 
-  // 3. Lead em conversa já iniciada (histórico existente com prompt de lead)
+  // 3. Só responde se o número estiver no CRM (veio do formulário Meta)
+  if (!eLeadCRM(fone)) {
+    return { tipo: "ignorar" };
+  }
+
+  // 4. Lead em conversa já iniciada
   if (historicos.has(numero + "_lead")) {
     return { tipo: "lead_continuacao", conteudo: texto };
   }
 
-  // 4. Qualquer outra mensagem — ignora
-  return { tipo: "ignorar" };
+  // 5. Primeiro contato do lead
+  return { tipo: "lead", conteudo: texto };
 }
 
 // ── Conexão WhatsApp ──────────────────────────────────────────────────────────
@@ -397,7 +427,7 @@ function hora() {
   return new Date().toLocaleTimeString("pt-BR");
 }
 
-module.exports = { iniciarWhatsApp, getStatus, desconectar, enviarMensagem, lerChats };
+module.exports = { iniciarWhatsApp, getStatus, desconectar, enviarMensagem, lerChats, pausarBot, reativarBot, botPausado };
 
 // Quando executado diretamente (node src/whatsapp.js), inicia automaticamente
 if (require.main === module) {
