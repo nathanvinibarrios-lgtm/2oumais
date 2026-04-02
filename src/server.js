@@ -792,11 +792,10 @@ app.post("/api/zapier/lead", async (req, res) => {
       salvarCRM(lista);
       console.log(`[Zapier] ✓ Novo lead: ${lead.nome} (${telefone})`);
 
-      // Envia mensagem de boas-vindas via Z-API
+      // Envia mensagem de boas-vindas via Baileys
       if (telefone) {
         try {
-          const zapi = require("./zapi");
-          await zapi.enviarMensagem(telefone, gerarMensagemBoasVindas(nome));
+          await whatsapp.enviarMensagem(telefone, gerarMensagemBoasVindas(nome));
           console.log(`[Zapier] ✓ Mensagem enviada para ${telefone}`);
         } catch (e) {
           console.error(`[Zapier] Erro ao enviar mensagem:`, e.message);
