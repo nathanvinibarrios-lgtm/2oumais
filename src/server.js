@@ -759,6 +759,51 @@ app.post("/api/funil/config", autenticado, (req, res) => {
   res.json({ ok: true });
 });
 
+// ── Zapier Lead Webhook ───────────────────────────────────────────────────────
+const MENSAGEM_BOAS_VINDAS = `Olá! Vi que você preencheu nosso formulário. Aqui é da 2oumais Marketing Digital! 😊\n\nPosso te ajudar com mais informações?`;
+
+app.post("/api/zapier/lead", async (req, res) => {
+  res.sendStatus(200);
+  try {
+    const { nome, fone, whats, email } = req.body;
+    const telefone = (whats || fone || "").replace(/\D/g, "");
+
+    // Adiciona ao CRM
+    const lista = lerCRM();
+    const jaExiste = lista.some(l => l.fone === telefone);
+    if (!jaExiste && telefone) {
+      const lead = {
+        id: Date.now(),
+        nome: nome || "Lead Meta Ads",
+        empresa: "",
+        fone: telefone,
+        email: email || "",
+        valor: "",
+        fonte: "Meta Ads — Formulário",
+        etapa: "novo",
+        obs: req.body.anuncio ? `Anúncio: ${req.body.anuncio}` : "",
+        criadoEm: new Date().toISOString(),
+      };
+      lista.unshift(lead);
+      salvarCRM(lista);
+      console.log(`[Zapier] ✓ Novo lead: ${lead.nome} (${telefone})`);
+
+      // Envia mensagem de boas-vindas via Z-API
+      if (telefone) {
+        try {
+          const zapi = require("./zapi");
+          await zapi.enviarMensagem(telefone, MENSAGEM_BOAS_VINDAS);
+          console.log(`[Zapier] ✓ Mensagem enviada para ${telefone}`);
+        } catch (e) {
+          console.error(`[Zapier] Erro ao enviar mensagem:`, e.message);
+        }
+      }
+    }
+  } catch (e) {
+    console.error("[Zapier webhook]", e.message);
+  }
+});
+
 // ── Agenda ────────────────────────────────────────────────────────────────────
 app.get("/api/agenda", autenticado, (_req, res) => res.json(lerAgenda()));
 
