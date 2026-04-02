@@ -1253,6 +1253,8 @@ _______________________________
       <div style="display:flex;gap:8px">
         <button onclick="abrirConfigCRM()" style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:600;color:#64748b;cursor:pointer;font-family:inherit;transition:all .15s" onmouseover="this.style.borderColor='#6366f1';this.style.color='#6366f1'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b'">⚙️ Colunas</button>
         <button id="btn-sync-meta" onclick="syncLeadsMeta()" style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:600;color:#16a34a;cursor:pointer;font-family:inherit;transition:all .15s">⬇️ Sincronizar Meta</button>
+        <button onclick="document.getElementById('crm-import-file').click()" style="background:#eff6ff;border:1.5px solid #93c5fd;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:600;color:#2563eb;cursor:pointer;font-family:inherit;transition:all .15s">📥 Importar CSV/XLS</button>
+        <input type="file" id="crm-import-file" accept=".csv,.xls,.xlsx" style="display:none" onchange="importarListaCRM(this)">
         <button class="crm-btn-add" onclick="abrirModalCRM('novo', null)">＋ Novo Lead</button>
       </div>
     </div>
@@ -1901,6 +1903,25 @@ Posso te mostrar como? 😊</textarea>
   async function waDesconectar() {
     await fetch('/api/whatsapp/desconectar', { method: 'POST' });
     await atualizarStatusWA();
+  }
+
+  async function importarListaCRM(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('arquivo', file);
+    try {
+      const res = await fetch('/api/crm/importar', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (data.erro) throw new Error(data.erro);
+      alert(`✓ ${data.novos} novo(s) lead(s) importado(s)!`);
+      const crm = await fetch('/api/crm');
+      crmLeads = await crm.json();
+      renderCRM();
+    } catch (e) {
+      alert('Erro ao importar: ' + e.message);
+    }
+    input.value = '';
   }
 
   async function syncLeadsMeta() {

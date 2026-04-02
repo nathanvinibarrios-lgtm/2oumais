@@ -636,6 +636,42 @@ app.post("/api/crm/sync-meta", autenticado, async (_req, res) => {
   }
 });
 
+// Importar lista CSV/XLS para o CRM
+const multer = require("multer");
+const XLSX = require("xlsx");
+const upload = multer({ storage: multer.memoryStorage() });
+
+app.post("/api/crm/importar", autenticado, upload.single("arquivo"), (req, res) => {
+  try {
+    const workbook = XLSX.read(req.file.buffer, { type: "buffer" });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+    const lista = lerCRM();
+    const fonesExistentes = new Set(lista.map(l => l.fone).filter(Boolean));
+    let novos = 0;
+
+    for (const row of rows) {
+      const nome  = String(row.nome || row.Nome || row.NOME || row.name || "").trim();
+      const fone  = String(row.fone || row.Fone || row.FONE || row.phone || row.whats || row.celular || row.telefone || "").replace(/\D/g, "").trim();
+      const email = String(row.email || row.Email || row.EMAIL || "").trim();
+      const empresa = String(row.empresa || row.Empresa || row.EMPRESA || "").trim();
+
+      if (!fone) continue;
+      if (fonesExistentes.has(fone)) continue;
+
+      lista.unshift({ id: Date.now() + novos, nome: nome || fone, empresa, fone, email, valor: "", fonte: "Importação", etapa: "novo", obs: "", criadoEm: new Date().toISOString() });
+      fonesExistentes.add(fone);
+      novos++;
+    }
+
+    salvarCRM(lista);
+    res.json({ ok: true, novos, total: lista.length });
+  } catch (e) {
+    res.status(500).json({ erro: e.message });
+  }
+});
+
 app.get("/api/crm", autenticado, (_req, res) => res.json(lerCRM()));
 
 app.post("/api/crm", autenticado, (req, res) => {
