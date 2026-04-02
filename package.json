@@ -4,7 +4,7 @@
   "description": "Agente Node.js para monitorar e pausar campanhas Meta Ads com CPL acima do limite",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node src/server.js",
     "dev": "node --watch index.js",
     "dashboard": "node src/server.js",
     "dashboard:dev": "node --watch src/server.js",
