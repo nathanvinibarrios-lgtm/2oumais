@@ -1,0 +1,2810 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>2oumais — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f1f5f9; color: #334155; min-height: 100vh; display: flex; }
+
+    /* ── SIDEBAR ─────────────────────────────────────── */
+    .sidebar {
+      width: 230px; background: #fff; border-right: 1px solid #e2e8f0;
+      position: fixed; left: 0; top: 0; bottom: 0;
+      display: flex; flex-direction: column; z-index: 100;
+    }
+    .sidebar-brand {
+      padding: 18px 16px 14px; border-bottom: 1px solid #f1f5f9;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sidebar-brand-mark {
+      width: 34px; height: 34px; background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 900; color: #fff; flex-shrink: 0;
+    }
+    .sidebar-brand h1 { font-size: 15px; font-weight: 800; color: #0f172a; }
+    .sidebar-brand h1 span { color: #6366f1; }
+
+    .sidebar-nav { flex: 1; padding: 10px 10px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+    .sidebar-section { font-size: 10px; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: .8px; padding: 12px 12px 6px; }
+
+    .sidebar-item {
+      display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+      border-radius: 9px; cursor: pointer; transition: all .15s;
+      color: #64748b; font-size: 13px; font-weight: 600; border: none; background: none; width: 100%; text-align: left;
+    }
+    .sidebar-item:hover { background: #f8fafc; color: #0f172a; }
+    .sidebar-item.active { background: #ede9fe; color: #6366f1; }
+    .sidebar-item-icon { font-size: 15px; width: 22px; text-align: center; flex-shrink: 0; }
+
+    .sidebar-bottom { padding: 10px; border-top: 1px solid #f1f5f9; }
+    .sidebar-status { display: flex; align-items: center; gap: 6px; padding: 6px 12px; font-size: 11px; color: #94a3b8; margin-bottom: 4px; }
+    .sidebar-logout {
+      display: flex; align-items: center; gap: 8px; padding: 9px 12px;
+      border-radius: 9px; color: #94a3b8; font-size: 13px; font-weight: 600;
+      cursor: pointer; text-decoration: none; transition: all .15s; width: 100%;
+    }
+    .sidebar-logout:hover { background: #fee2e2; color: #ef4444; }
+
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; animation: pulse 2s infinite; flex-shrink: 0; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    /* ── CONTEÚDO PRINCIPAL ──────────────────────────── */
+    .main { margin-left: 230px; flex: 1; padding: 28px 32px; min-height: 100vh; }
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .page-header { margin-bottom: 24px; }
+    .page-title { font-size: 20px; font-weight: 800; color: #0f172a; margin-bottom: 3px; }
+    .page-sub { font-size: 13px; color: #94a3b8; }
+
+    /* Tabs */
+    .periodo-tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+    .tab {
+      padding: 7px 18px; border-radius: 8px; border: 1.5px solid #e2e8f0;
+      background: #fff; color: #64748b; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all .15s; font-family: inherit;
+    }
+    .tab:hover { border-color: #6366f1; color: #6366f1; background: #f5f3ff; }
+    .tab.active { background: #6366f1; border-color: #6366f1; color: #fff; box-shadow: 0 2px 8px rgba(99,102,241,.25); }
+
+    /* Barra de progresso */
+    .refresh-bar { height: 3px; background: #e2e8f0; border-radius: 2px; margin-bottom: 20px; overflow: hidden; }
+    .refresh-progress { height: 100%; background: linear-gradient(90deg, #6366f1, #8b5cf6); width: 0%; }
+
+    /* Cards resumo */
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 18px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+    .card-label { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 8px; font-weight: 600; }
+    .card-value { font-size: 24px; font-weight: 800; color: #0f172a; }
+    .card-sub { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+    .green { color: #16a34a; }
+    .red   { color: #dc2626; }
+    .yellow{ color: #d97706; }
+    .purple{ color: #7c3aed; }
+    .blue  { color: #2563eb; }
+    .orange{ color: #ea580c; }
+
+    /* Seções */
+    .section-title { font-size: 11px; font-weight: 700; color: #94a3b8; margin-bottom: 12px; text-transform: uppercase; letter-spacing: .6px; }
+    .section { margin-bottom: 28px; }
+
+    /* Tabelas */
+    .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+    table { width: 100%; border-collapse: collapse; background: #fff; overflow: hidden; }
+    thead tr { background: #f8fafc; }
+    th { text-align: left; padding: 11px 16px; font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid #e2e8f0; white-space: nowrap; font-weight: 700; }
+    td { padding: 13px 16px; font-size: 13px; border-bottom: 1px solid #f1f5f9; vertical-align: top; color: #334155; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafbfc; }
+
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .badge-ok      { background: #dcfce7; color: #16a34a; }
+    .badge-acima   { background: #fee2e2; color: #dc2626; }
+    .badge-pausada { background: #f3f4f6; color: #6b7280; }
+    .badge-sem     { background: #ede9fe; color: #7c3aed; }
+    .badge-active  { background: #dcfce7; color: #16a34a; }
+    .badge-paused  { background: #f3f4f6; color: #6b7280; }
+
+    .nome-camp { max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; color: #0f172a; }
+    .sugestoes .sug-item { font-size: 11px; color: #64748b; padding: 2px 0; display: flex; gap: 5px; line-height: 1.4; }
+    .sug-item::before { content: '→'; color: #6366f1; flex-shrink: 0; }
+    .sug-item.bom::before { content: '★'; color: #16a34a; }
+    .sug-item.bom { color: #16a34a; }
+
+    .thumb { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+    .thumb-placeholder { width: 40px; height: 40px; border-radius: 8px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .ad-info { display: flex; align-items: center; gap: 10px; }
+    .ad-nome { max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; color: #0f172a; }
+    .ad-titulo { font-size: 11px; color: #94a3b8; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px; }
+    .ctr-bar { height: 4px; background: #e2e8f0; border-radius: 2px; margin-top: 4px; width: 80px; }
+    .ctr-fill { height: 100%; border-radius: 2px; background: #6366f1; }
+    .loading { text-align: center; padding: 60px; color: #94a3b8; }
+    .error-msg { text-align: center; padding: 40px; color: #dc2626; }
+    .empty { text-align: center; padding: 30px; color: #94a3b8; font-size: 13px; }
+
+    /* ── FUNIL ─────────────────────────────────────────── */
+
+    .funil-layout { display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start; }
+    @media (max-width: 900px) { .funil-layout { grid-template-columns: 1fr; } }
+
+    /* Formulário funil */
+    .form-card {
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 14px;
+      padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,.05), 0 4px 16px rgba(0,0,0,.04);
+    }
+    .form-card h3 {
+      font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase;
+      letter-spacing: .7px; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid #f1f5f9;
+    }
+    .form-row { margin-bottom: 14px; }
+    .form-row label { display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .4px; }
+    .form-row input {
+      width: 100%; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px;
+      padding: 10px 12px; color: #0f172a; font-size: 13px; outline: none; transition: all .15s; font-family: inherit;
+    }
+    .form-row input:focus { border-color: #6366f1; background: #fff; box-shadow: 0 0 0 3px rgba(99,102,241,.1); }
+    .btn-save {
+      width: 100%; background: #6366f1; color: #fff; border: none; border-radius: 9px;
+      padding: 12px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all .2s;
+      margin-top: 4px; font-family: inherit; box-shadow: 0 2px 8px rgba(99,102,241,.3);
+    }
+    .btn-save:hover { background: #4f46e5; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(99,102,241,.4); }
+    .save-msg { font-size: 12px; color: #16a34a; text-align: center; margin-top: 8px; height: 16px; font-weight: 600; }
+
+    /* ── FUNIL VISUAL REAL ──────────────────────────────── */
+    .funil-visual {
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 28px 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.05), 0 4px 16px rgba(0,0,0,.04);
+    }
+    .funil-visual h3 {
+      font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase;
+      letter-spacing: .7px; margin-bottom: 28px; padding-bottom: 14px; border-bottom: 1px solid #f1f5f9;
+    }
+
+    /* Container do funil real */
+    .funil-real { display: flex; flex-direction: column; align-items: center; gap: 0; }
+
+    .funil-step-wrap { width: 100%; display: flex; flex-direction: column; align-items: center; }
+
+    .funil-step-block {
+      display: flex; align-items: center; justify-content: space-between;
+      border-radius: 10px; padding: 14px 20px; transition: width .8s cubic-bezier(.4,0,.2,1);
+      position: relative; cursor: default;
+    }
+    .funil-step-block:hover { filter: brightness(1.1); }
+
+    .funil-step-left  { display: flex; flex-direction: column; }
+    .funil-step-nome  { font-size: 13px; font-weight: 700; color: #fff; }
+    .funil-step-conv  { font-size: 11px; color: rgba(255,255,255,.6); margin-top: 2px; }
+    .funil-step-right { text-align: right; }
+    .funil-step-num   { font-size: 22px; font-weight: 800; color: #fff; line-height: 1; }
+    .funil-step-pct   { font-size: 11px; color: rgba(255,255,255,.6); margin-top: 2px; }
+
+    /* Seta entre etapas */
+    .funil-gap {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 6px 0; width: 100%;
+    }
+    .funil-gap-line { flex: 1; height: 1px; background: #e2e8f0; max-width: 80px; }
+    .funil-gap-pct  { font-size: 11px; font-weight: 600; color: #94a3b8; white-space: nowrap; }
+
+    /* Cores por etapa */
+    .fs-1 { background: linear-gradient(135deg, #6366f1, #4f46e5); box-shadow: 0 4px 20px rgba(99,102,241,.3); }
+    .fs-2 { background: linear-gradient(135deg, #8b5cf6, #7c3aed); box-shadow: 0 4px 20px rgba(139,92,246,.25); }
+    .fs-3 { background: linear-gradient(135deg, #06b6d4, #0891b2); box-shadow: 0 4px 20px rgba(6,182,212,.25); }
+    .fs-4 { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 4px 20px rgba(245,158,11,.25); }
+    .fs-5 { background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow: 0 4px 20px rgba(34,197,94,.25); }
+
+    /* KPI cards funil */
+    .kpi-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .kpi-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 18px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+    .kpi-label { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; font-weight: 600; }
+    .kpi-value { font-size: 22px; font-weight: 800; color: #0f172a; }
+    .kpi-sub { font-size: 11px; color: #94a3b8; margin-top: 3px; }
+
+    /* Taxas */
+    .taxas-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 24px; }
+    .taxa-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; }
+    .taxa-label { font-size: 11px; color: #64748b; margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
+    .taxa-value { font-size: 20px; font-weight: 800; color: #0f172a; }
+    .taxa-desc { font-size: 11px; color: #94a3b8; margin-top: 3px; }
+
+    /* ── CRM ────────────────────────────────────────────── */
+    .crm-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+    .crm-search { flex: 1; max-width: 280px; padding: 9px 14px; border: 1.5px solid #e2e8f0; border-radius: 9px; font-size: 13px; color: #0f172a; outline: none; transition: all .15s; font-family: inherit; background: #fff; }
+    .crm-search:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,.1); }
+    .crm-btn-add { background: #6366f1; color: #fff; border: none; border-radius: 9px; padding: 9px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all .15s; display: flex; align-items: center; gap: 7px; box-shadow: 0 2px 8px rgba(99,102,241,.3); }
+    .crm-btn-add:hover { background: #4f46e5; transform: translateY(-1px); }
+
+    /* ── WhatsApp connect card ────────────────────── */
+    .wa-card { background: #fff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 18px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .wa-icon { width: 44px; height: 44px; background: #dcfce7; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .wa-info { flex: 1; min-width: 180px; }
+    .wa-info-title { font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 2px; }
+    .wa-info-sub { font-size: 12px; color: #94a3b8; }
+    .wa-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .wa-badge.desconectado { background: #f1f5f9; color: #94a3b8; }
+    .wa-badge.aguardando_qr { background: #fef9c3; color: #a16207; }
+    .wa-badge.conectado { background: #dcfce7; color: #16a34a; }
+    .wa-btn { padding: 9px 16px; border-radius: 9px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all .15s; }
+    .wa-btn-conectar { background: #22c55e; color: #fff; box-shadow: 0 2px 8px rgba(34,197,94,.3); }
+    .wa-btn-conectar:hover { background: #16a34a; }
+    .wa-btn-desconectar { background: #fee2e2; color: #dc2626; }
+    .wa-btn-desconectar:hover { background: #fecaca; }
+    .wa-qr-wrap { width: 100%; display: flex; justify-content: center; margin-top: 12px; }
+    .wa-qr-wrap img { width: 200px; height: 200px; border-radius: 12px; border: 3px solid #e2e8f0; }
+
+    /* ── Agenda ───────────────────────────────────── */
+    .agenda-toolbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:12px; }
+    .agenda-add-btn { background:#6366f1; color:#fff; border:none; border-radius:9px; padding:9px 18px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; transition:all .15s; }
+    .agenda-add-btn:hover { background:#4f46e5; }
+    .agenda-day { margin-bottom:24px; }
+    .agenda-day-label { font-size:12px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:.6px; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+    .agenda-day-label span { background:#f1f5f9; padding:2px 10px; border-radius:20px; }
+    .agenda-day-label.hoje span { background:#ede9fe; color:#6366f1; }
+    .agenda-items { display:flex; flex-direction:column; gap:8px; }
+    .agenda-item { background:#fff; border:1.5px solid #e2e8f0; border-radius:12px; padding:14px 16px; display:flex; align-items:flex-start; gap:14px; transition:all .15s; }
+    .agenda-item.feito { opacity:.5; }
+    .agenda-item.cancelado { opacity:.4; text-decoration:line-through; }
+    .agenda-item-icon { width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+    .agenda-item-icon.ligacao  { background:#dbeafe; }
+    .agenda-item-icon.reuniao  { background:#dcfce7; }
+    .agenda-item-icon.retorno  { background:#fef9c3; }
+    .agenda-item-body { flex:1; min-width:0; }
+    .agenda-item-title { font-size:14px; font-weight:700; color:#0f172a; margin-bottom:2px; }
+    .agenda-item-sub   { font-size:12px; color:#64748b; margin-bottom:4px; }
+    .agenda-item-obs   { font-size:12px; color:#94a3b8; font-style:italic; }
+    .agenda-item-actions { display:flex; flex-direction:column; gap:6px; align-items:flex-end; flex-shrink:0; }
+    .agenda-hora { font-size:13px; font-weight:700; color:#6366f1; }
+    .agenda-status-btn { font-size:11px; font-weight:700; border:none; border-radius:6px; padding:4px 10px; cursor:pointer; font-family:inherit; transition:all .15s; }
+    .agenda-status-btn.pendente { background:#f1f5f9; color:#64748b; }
+    .agenda-status-btn.pendente:hover { background:#dcfce7; color:#16a34a; }
+    .agenda-status-btn.feito   { background:#dcfce7; color:#16a34a; }
+    .agenda-status-btn.cancelado { background:#fee2e2; color:#dc2626; }
+    .agenda-del-btn { font-size:11px; background:none; border:none; color:#cbd5e1; cursor:pointer; padding:2px 6px; border-radius:6px; }
+    .agenda-del-btn:hover { color:#ef4444; background:#fee2e2; }
+    .agenda-empty { text-align:center; color:#94a3b8; padding:48px; font-size:14px; }
+
+    /* Agendar inline no chat */
+    .chat-agendar-form { background:#f8fafc; border-top:1px solid #e2e8f0; padding:14px 16px; display:flex; flex-direction:column; gap:10px; }
+    .chat-agendar-form select, .chat-agendar-form input[type=date], .chat-agendar-form input[type=time], .chat-agendar-form input[type=text] { padding:8px 12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:13px; font-family:inherit; outline:none; width:100%; }
+    .chat-agendar-form select:focus, .chat-agendar-form input:focus { border-color:#6366f1; }
+    .chat-agendar-row { display:flex; gap:8px; }
+    .chat-agendar-row > * { flex:1; }
+    .chat-agendar-actions { display:flex; gap:8px; }
+    .chat-agendar-save { flex:1; background:#6366f1; color:#fff; border:none; border-radius:8px; padding:9px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
+    .chat-agendar-cancel { background:#f1f5f9; color:#64748b; border:none; border-radius:8px; padding:9px 14px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
+
+    .crm-board { display: flex; gap: 14px; overflow-x: auto; padding-bottom: 16px; align-items: flex-start; }
+    .crm-board::-webkit-scrollbar { height: 6px; }
+    .crm-board::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
+    .crm-board::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+    .crm-col { background: #f8fafc; border-radius: 12px; padding: 12px; min-width: 232px; max-width: 232px; border: 1px solid #e2e8f0; }
+    .crm-col-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 2px solid; }
+    .crm-col-left { display: flex; align-items: center; gap: 8px; }
+    .crm-col-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .crm-col-title { font-size: 12px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: .4px; }
+    .crm-col-count { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+
+    .crm-cards { display: flex; flex-direction: column; gap: 8px; min-height: 80px; }
+    .crm-card { background: #fff; border-radius: 10px; padding: 13px 14px; border: 1px solid #e2e8f0; cursor: pointer; transition: all .15s; }
+    .crm-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); transform: translateY(-1px); border-color: #c7d2fe; }
+    .crm-card-name { font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 2px; }
+    .crm-card-empresa { font-size: 12px; color: #64748b; margin-bottom: 8px; }
+    .crm-card-valor { font-size: 13px; font-weight: 800; color: #6366f1; }
+    .crm-card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f1f5f9; }
+    .crm-card-fonte { font-size: 11px; color: #94a3b8; background: #f1f5f9; padding: 2px 7px; border-radius: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
+    .crm-card-data { font-size: 11px; color: #cbd5e1; }
+    .crm-add-card { width: 100%; padding: 10px; background: transparent; border: 1.5px dashed #e2e8f0; border-radius: 10px; color: #94a3b8; font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s; text-align: center; font-family: inherit; margin-top: 4px; }
+    .crm-add-card:hover { border-color: #6366f1; color: #6366f1; background: #f5f3ff; }
+
+    /* Cores das colunas */
+    .crm-c-novo     { border-bottom-color: #6366f1; }
+    .crm-c-contato  { border-bottom-color: #06b6d4; }
+    .crm-c-reuniao  { border-bottom-color: #f59e0b; }
+    .crm-c-proposta { border-bottom-color: #8b5cf6; }
+    .crm-c-fechado  { border-bottom-color: #22c55e; }
+    .crm-c-perdido  { border-bottom-color: #ef4444; }
+    .crm-dot-novo     { background: #6366f1; }
+    .crm-dot-contato  { background: #06b6d4; }
+    .crm-dot-reuniao  { background: #f59e0b; }
+    .crm-dot-proposta { background: #8b5cf6; }
+    .crm-dot-fechado  { background: #22c55e; }
+    .crm-dot-perdido  { background: #ef4444; }
+    .crm-cnt-novo     { background: #ede9fe; color: #6366f1; }
+    .crm-cnt-contato  { background: #cffafe; color: #0891b2; }
+    .crm-cnt-reuniao  { background: #fef9c3; color: #d97706; }
+    .crm-cnt-proposta { background: #ede9fe; color: #7c3aed; }
+    .crm-cnt-fechado  { background: #dcfce7; color: #16a34a; }
+    .crm-cnt-perdido  { background: #fee2e2; color: #dc2626; }
+
+
+    /* ── SUB-ABAS ───────────────────────────────────────── */
+    .sub-tabs { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 2px solid #e2e8f0; padding-bottom: 0; }
+    .sub-tab {
+      padding: 9px 18px; font-size: 13px; font-weight: 600; color: #64748b;
+      cursor: pointer; border: none; background: none; border-bottom: 2px solid transparent;
+      margin-bottom: -2px; transition: all .15s; font-family: inherit;
+    }
+    .sub-tab:hover { color: #6366f1; }
+    .sub-tab.active { color: #6366f1; border-bottom-color: #6366f1; }
+    .sub-view { display: none; }
+    .sub-view.active { display: block; }
+
+    /* ── CONFIG CRM ─────────────────────────────────────── */
+    .config-col-row {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 9px; margin-bottom: 8px;
+    }
+    .config-col-handle { cursor: grab; color: #cbd5e1; font-size: 16px; flex-shrink: 0; }
+    .config-col-input {
+      flex: 1; border: 1.5px solid #e2e8f0; border-radius: 7px; padding: 7px 10px;
+      font-size: 13px; font-family: inherit; color: #0f172a; background: #fff; outline: none;
+    }
+    .config-col-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,.1); }
+    .config-col-up, .config-col-down {
+      background: none; border: 1.5px solid #e2e8f0; border-radius: 6px; padding: 4px 8px;
+      cursor: pointer; color: #64748b; font-size: 12px; transition: all .15s;
+    }
+    .config-col-up:hover, .config-col-down:hover { border-color: #6366f1; color: #6366f1; background: #f5f3ff; }
+
+    /* ── CONTRATOS ─────────────────────────────────────── */
+
+    .ct-header { margin-bottom: 28px; }
+    .ct-header h2 { font-size: 22px; font-weight: 700; color: #111; margin-bottom: 4px; }
+    .ct-header p  { font-size: 13px; color: #888; }
+
+    .contrato-layout { display: grid; grid-template-columns: 400px 1fr; gap: 24px; align-items: start; }
+    @media (max-width: 1000px) { .contrato-layout { grid-template-columns: 1fr; } }
+
+    /* Formulário */
+    .contrato-form {
+      background: #fff; border-radius: 14px; padding: 28px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.07), 0 4px 20px rgba(0,0,0,.05);
+    }
+    .ct-form-title {
+      font-size: 13px; font-weight: 700; color: #111; margin-bottom: 20px;
+      padding-bottom: 14px; border-bottom: 1px solid #f0f0f0;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 11px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 5px; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; background: #f8f9fb; border: 1.5px solid #e8eaed; border-radius: 8px;
+      padding: 9px 12px; color: #111; font-size: 13px; outline: none;
+      transition: border .15s, box-shadow .15s; font-family: inherit;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,.1); background: #fff;
+    }
+    .form-group textarea { resize: vertical; line-height: 1.6; font-size: 12px; }
+    .form-divider { border: none; border-top: 1px solid #f0f0f0; margin: 18px 0; }
+    .form-section-label {
+      font-size: 10px; font-weight: 700; color: #bbb; text-transform: uppercase;
+      letter-spacing: .8px; margin-bottom: 12px; margin-top: 4px;
+    }
+
+    /* Planos */
+    .planos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 14px; }
+    .plano-btn {
+      padding: 9px 6px; border-radius: 8px; border: 1.5px solid #e8eaed;
+      background: #f8f9fb; color: #666; font-size: 11px; font-weight: 700;
+      cursor: pointer; transition: all .15s; text-align: center; line-height: 1.3;
+    }
+    .plano-btn:hover { border-color: #6366f1; color: #6366f1; background: #f0f0ff; }
+    .plano-btn.active { background: #6366f1; border-color: #6366f1; color: #fff; box-shadow: 0 2px 8px rgba(99,102,241,.3); }
+    .plano-btn .plano-valor { display: block; font-size: 13px; font-weight: 800; margin-top: 2px; }
+
+    /* Valor final */
+    .valor-final-box {
+      background: linear-gradient(135deg, #f0f4ff, #e8edff);
+      border: 1.5px solid #c7d2fe; border-radius: 9px;
+      padding: 10px 14px; margin-bottom: 14px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .valor-final-box span:first-child { font-size: 11px; font-weight: 600; color: #6366f1; text-transform: uppercase; letter-spacing: .5px; }
+    .valor-final-box span:last-child  { font-size: 18px; font-weight: 800; color: #4f46e5; }
+
+    /* Toggle */
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding: 10px 12px; background: #f8f9fb; border-radius: 8px; border: 1.5px solid #e8eaed; }
+    .toggle-row label:first-child { font-size: 12px; font-weight: 600; color: #444; }
+    .toggle { position: relative; display: inline-block; width: 40px; height: 22px; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; inset: 0; background: #d1d5db; border-radius: 22px; cursor: pointer; transition: .2s; }
+    .toggle-slider::before { content: ''; position: absolute; width: 16px; height: 16px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: .2s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+    .toggle input:checked + .toggle-slider { background: #6366f1; }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
+
+    /* Botões de geração */
+    .btns-gerar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 20px; }
+    .btn-gerar {
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      border: none; border-radius: 9px; padding: 12px 8px; font-size: 13px;
+      font-weight: 700; cursor: pointer; transition: all .15s; font-family: inherit;
+    }
+    .btn-pdf  { background: #fee2e2; color: #dc2626; }
+    .btn-pdf:hover  { background: #dc2626; color: #fff; box-shadow: 0 4px 12px rgba(220,38,38,.3); }
+    .btn-docx { background: #dbeafe; color: #2563eb; }
+    .btn-docx:hover { background: #2563eb; color: #fff; box-shadow: 0 4px 12px rgba(37,99,235,.3); }
+    .contrato-status { font-size: 12px; text-align: center; margin-top: 10px; min-height: 18px; color: #aaa; }
+    .contrato-status.ok  { color: #16a34a; font-weight: 600; }
+    .contrato-status.err { color: #dc2626; font-weight: 600; }
+
+    /* Preview — papel */
+    .contrato-preview {
+      background: #fff; border-radius: 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.07), 0 8px 32px rgba(0,0,0,.08);
+      padding: 52px 56px; font-size: 13px; line-height: 1.8; color: #222;
+      font-family: 'Georgia', serif; position: relative;
+    }
+    .contrato-preview::before {
+      content: 'PRÉVIA'; position: absolute; top: 16px; right: 20px;
+      font-size: 10px; font-weight: 800; color: #e0e0e0; letter-spacing: 2px;
+      font-family: sans-serif;
+    }
+    .preview-titulo { font-size: 15px; font-weight: 700; color: #111; text-align: center; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; font-family: sans-serif; }
+    .preview-subtitulo { font-size: 12px; color: #888; text-align: center; margin-bottom: 32px; font-family: sans-serif; }
+    .preview-secao { font-size: 11px; font-weight: 800; color: #6366f1; text-transform: uppercase; letter-spacing: 1px; margin: 22px 0 8px; font-family: sans-serif; border-left: 3px solid #6366f1; padding-left: 8px; }
+    .preview-p { margin-bottom: 10px; text-align: justify; color: #333; }
+    .preview-campo { color: #4f46e5; font-weight: 700; font-style: normal; border-bottom: 1px dashed #c7d2fe; }
+    .preview-assinaturas { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 40px; padding-top: 28px; border-top: 1px solid #e8eaed; }
+    .assin-block { text-align: center; }
+    .assin-linha { border-top: 1px solid #999; margin-bottom: 8px; }
+    .assin-nome { font-size: 11px; color: #666; font-family: sans-serif; }
+
+    /* ── GESTÃO DE CONTRATOS ────────────────────────────── */
+    .gestao-header { display: flex; align-items: center; justify-content: space-between; margin: 36px 0 16px; }
+    .gestao-header h3 { font-size: 16px; font-weight: 700; color: #111; }
+    .gestao-filtros { display: flex; gap: 8px; }
+    .filtro-btn {
+      padding: 6px 14px; border-radius: 20px; border: 1.5px solid #e8eaed;
+      background: #f8f9fb; color: #666; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all .15s;
+    }
+    .filtro-btn:hover { border-color: #6366f1; color: #6366f1; }
+    .filtro-btn.active { background: #6366f1; border-color: #6366f1; color: #fff; }
+
+    .contratos-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+    .cs-card { background: #fff; border-radius: 12px; padding: 16px 20px; box-shadow: 0 1px 4px rgba(0,0,0,.06); display: flex; align-items: center; gap: 14px; }
+    .cs-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .cs-icon.ativo    { background: #dcfce7; }
+    .cs-icon.a_vencer { background: #fef9c3; }
+    .cs-icon.vencido  { background: #fee2e2; }
+    .cs-info-label { font-size: 11px; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
+    .cs-info-value { font-size: 24px; font-weight: 800; color: #111; line-height: 1.2; }
+
+    .contratos-lista { display: flex; flex-direction: column; gap: 10px; }
+    .contrato-card {
+      background: #fff; border-radius: 12px; padding: 18px 22px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+      display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16px;
+      border-left: 4px solid transparent; transition: box-shadow .15s;
+    }
+    .contrato-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+    .contrato-card.ativo    { border-left-color: #22c55e; }
+    .contrato-card.a_vencer { border-left-color: #eab308; }
+    .contrato-card.vencido  { border-left-color: #ef4444; }
+
+    .cc-nome { font-size: 15px; font-weight: 700; color: #111; margin-bottom: 4px; }
+    .cc-meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: #888; margin-bottom: 8px; }
+    .cc-meta span { display: flex; align-items: center; gap: 4px; }
+    .cc-badges { display: flex; gap: 8px; align-items: center; }
+    .cc-badge {
+      padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px;
+    }
+    .cc-badge.ativo    { background: #dcfce7; color: #16a34a; }
+    .cc-badge.a_vencer { background: #fef9c3; color: #a16207; }
+    .cc-badge.vencido  { background: #fee2e2; color: #dc2626; }
+
+    .cc-barra-wrap { background: #f3f4f6; border-radius: 4px; height: 5px; margin-top: 8px; overflow: hidden; width: 200px; }
+    .cc-barra { height: 100%; border-radius: 4px; transition: width .4s; }
+    .cc-barra.ativo    { background: #22c55e; }
+    .cc-barra.a_vencer { background: #eab308; }
+    .cc-barra.vencido  { background: #ef4444; }
+
+    .cc-acoes { display: flex; gap: 8px; flex-shrink: 0; }
+    .cc-btn {
+      padding: 7px 14px; border-radius: 8px; border: 1.5px solid; font-size: 12px;
+      font-weight: 600; cursor: pointer; transition: all .15s; background: transparent;
+    }
+    .cc-btn-renovar { border-color: #6366f1; color: #6366f1; }
+    .cc-btn-renovar:hover { background: #6366f1; color: #fff; }
+    .cc-btn-excluir { border-color: #e8eaed; color: #aaa; }
+    .cc-btn-excluir:hover { border-color: #ef4444; color: #ef4444; }
+
+    .gestao-vazia { text-align: center; padding: 48px; color: #bbb; font-size: 14px; background: #fff; border-radius: 12px; }
+    .gestao-vazia div { font-size: 32px; margin-bottom: 12px; }
+
+    /* ── TEMPLATE ───────────────────────────────────────── */
+    .tpl-page-title { font-size: 22px; font-weight: 700; color: #111; margin-bottom: 4px; }
+    .tpl-page-sub   { font-size: 13px; color: #888; margin-bottom: 28px; }
+
+    .tpl-layout { display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; }
+    @media (max-width: 1000px) { .tpl-layout { grid-template-columns: 1fr; } }
+
+    /* Painel esquerdo — editor */
+    .tpl-editor-card { background: #fff; border-radius: 14px; padding: 28px; box-shadow: 0 1px 4px rgba(0,0,0,.07), 0 4px 20px rgba(0,0,0,.04); }
+
+    /* Steps de instrução */
+    .tpl-steps { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; padding: 20px; background: #f0f4ff; border-radius: 12px; border: 1.5px solid #c7d2fe; }
+    .tpl-step  { display: flex; gap: 14px; align-items: flex-start; }
+    .tpl-step-num {
+      width: 26px; height: 26px; border-radius: 50%; background: #6366f1; color: #fff;
+      font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .tpl-step-text { font-size: 13px; color: #374151; line-height: 1.5; }
+    .tpl-step-text strong { color: #4f46e5; }
+    .tpl-step-text code {
+      background: #e0e7ff; color: #4338ca; padding: 1px 6px; border-radius: 4px;
+      font-size: 12px; font-family: 'Courier New', monospace; font-weight: 700;
+    }
+
+    .tpl-editor-label { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 8px; }
+    #tpl-textarea {
+      width: 100%; min-height: 420px; background: #fafafa; border: 1.5px solid #e8eaed;
+      border-radius: 10px; padding: 16px; font-size: 13px; color: #111; line-height: 1.8;
+      font-family: 'Courier New', monospace; outline: none; resize: vertical; transition: border .15s;
+    }
+    #tpl-textarea:focus { border-color: #6366f1; background: #fff; box-shadow: 0 0 0 3px rgba(99,102,241,.1); }
+
+    .tpl-save-row { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+    .tpl-btn-save {
+      background: #6366f1; color: #fff; border: none; border-radius: 9px; padding: 11px 24px;
+      font-size: 13px; font-weight: 700; cursor: pointer; transition: background .15s; font-family: inherit;
+    }
+    .tpl-btn-save:hover { background: #4f46e5; }
+    .tpl-btn-reset {
+      background: transparent; color: #aaa; border: 1.5px solid #e8eaed; border-radius: 9px;
+      padding: 11px 18px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .15s;
+    }
+    .tpl-btn-reset:hover { border-color: #f87171; color: #ef4444; }
+    .tpl-save-msg { font-size: 12px; color: #16a34a; font-weight: 600; min-height: 18px; }
+
+    /* Painel direito — campos */
+    .tpl-campos-card { background: #fff; border-radius: 14px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,.07); position: sticky; top: 24px; }
+    .tpl-campos-title { font-size: 13px; font-weight: 700; color: #111; margin-bottom: 4px; }
+    .tpl-campos-sub   { font-size: 12px; color: #888; margin-bottom: 16px; line-height: 1.5; }
+
+    .tpl-grupo { margin-bottom: 20px; }
+    .tpl-grupo-label { font-size: 10px; font-weight: 800; color: #bbb; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .tpl-campo-btn {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; padding: 8px 10px; border-radius: 7px; border: 1.5px solid #e8eaed;
+      background: #f8f9fb; margin-bottom: 6px; cursor: pointer; transition: all .15s; text-align: left;
+    }
+    .tpl-campo-btn:hover { border-color: #6366f1; background: #f0f0ff; }
+    .tpl-campo-code { font-size: 12px; font-family: 'Courier New', monospace; font-weight: 700; color: #4338ca; }
+    .tpl-campo-desc { font-size: 11px; color: #aaa; margin-top: 1px; }
+    .tpl-campo-icon { font-size: 14px; opacity: .4; flex-shrink: 0; margin-left: 6px; }
+    .tpl-insert-tip { font-size: 11px; color: #bbb; text-align: center; padding: 10px; background: #f8f9fb; border-radius: 8px; }
+
+    /* Modal edição */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal-overlay.hidden { display: none; }
+    .modal-box {
+      background: #fff; border-radius: 16px; padding: 32px; width: 420px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.2);
+    }
+    .modal-box h4 { font-size: 16px; font-weight: 700; color: #111; margin-bottom: 20px; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .modal-btn { flex: 1; padding: 11px; border-radius: 9px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    .modal-btn-ok     { background: #6366f1; color: #fff; }
+    .modal-btn-ok:hover { background: #4f46e5; }
+    .modal-btn-cancel { background: #f3f4f6; color: #666; }
+    .modal-btn-cancel:hover { background: #e5e7eb; }
+
+    /* ── Chat modal ───────────────────────────────── */
+    .chat-modal { width: 420px; max-width: 95vw; padding: 0; overflow: hidden; display: flex; flex-direction: column; height: 600px; max-height: 90vh; }
+    .chat-header { padding: 18px 20px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; }
+    .chat-header-info { display: flex; flex-direction: column; }
+    .chat-header-name { font-size: 15px; font-weight: 700; color: #0f172a; }
+    .chat-header-fone { font-size: 12px; color: #94a3b8; margin-top: 1px; }
+    .chat-close { background: none; border: none; font-size: 20px; cursor: pointer; color: #94a3b8; padding: 4px; line-height: 1; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; background: #f8fafc; }
+    .chat-msg { max-width: 80%; padding: 9px 13px; border-radius: 12px; font-size: 13px; line-height: 1.5; word-break: break-word; }
+    .chat-msg.deles { background: #fff; border: 1px solid #e2e8f0; color: #0f172a; align-self: flex-start; border-bottom-left-radius: 4px; }
+    .chat-msg.meu { background: #6366f1; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+    .chat-msg-time { font-size: 10px; opacity: .6; margin-top: 3px; text-align: right; }
+    .chat-empty { text-align: center; color: #94a3b8; font-size: 13px; margin: auto; }
+    .chat-input-row { display: flex; gap: 8px; padding: 14px 16px; border-top: 1px solid #e2e8f0; background: #fff; }
+    .chat-input { flex: 1; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 22px; font-size: 13px; outline: none; font-family: inherit; transition: border-color .15s; }
+    .chat-input:focus { border-color: #6366f1; }
+    .chat-send { background: #6366f1; color: #fff; border: none; border-radius: 22px; padding: 10px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: background .15s; white-space: nowrap; }
+    .chat-send:hover { background: #4f46e5; }
+    .chat-send:disabled { background: #c7d2fe; cursor: default; }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-mark">2+</div>
+    <h1>2oumais <span>ads</span></h1>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="sidebar-section">Principal</div>
+    <button class="sidebar-item active" onclick="trocarView('campanhas')">
+      <span class="sidebar-item-icon">📊</span> Meta Ads
+    </button>
+    <button class="sidebar-item" onclick="trocarView('google')">
+      <span class="sidebar-item-icon">🔍</span> Google Ads
+    </button>
+    <button class="sidebar-item" onclick="trocarView('funil')">
+      <span class="sidebar-item-icon">🔻</span> Funil de Vendas
+    </button>
+    <button class="sidebar-item" onclick="trocarView('crm')">
+      <span class="sidebar-item-icon">🤝</span> CRM
+    </button>
+    <button class="sidebar-item" onclick="trocarView('agenda')">
+      <span class="sidebar-item-icon">📅</span> Agenda
+    </button>
+
+    <div class="sidebar-section" style="margin-top:8px">Documentos</div>
+    <button class="sidebar-item" onclick="trocarView('contratos')">
+      <span class="sidebar-item-icon">📄</span> Contratos
+    </button>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="sidebar-status">
+      <div class="dot"></div>
+      <span id="next-update">Atualizando...</span>
+    </div>
+    <a href="/logout" class="sidebar-logout">
+      <span>🚪</span> Sair
+    </a>
+  </div>
+</aside>
+
+<div class="main">
+
+  <!-- ── VIEW CAMPANHAS ─────────────────────────────── -->
+  <div class="view active" id="view-campanhas">
+    <div class="page-title">📊 Campanhas</div>
+    <div class="page-sub">Monitoramento em tempo real das campanhas ativas</div>
+    <div class="refresh-bar"><div class="refresh-progress" id="progress-bar"></div></div>
+
+    <div class="periodo-tabs" id="tabs-campanhas">
+      <div class="tab active" onclick="trocarPeriodo(1)">Hoje (24h)</div>
+      <div class="tab" onclick="trocarPeriodo(7)">7 dias</div>
+      <div class="tab" onclick="trocarPeriodo(15)">15 dias</div>
+    </div>
+
+    <div class="cards">
+      <div class="card"><div class="card-label">Campanhas ativas</div><div class="card-value" id="c-total">—</div></div>
+      <div class="card"><div class="card-label">Gasto total</div><div class="card-value purple" id="c-gasto">—</div></div>
+      <div class="card"><div class="card-label">Total de leads</div><div class="card-value green" id="c-leads">—</div></div>
+      <div class="card"><div class="card-label">CPL médio</div><div class="card-value" id="c-cpl-medio">—</div></div>
+      <div class="card"><div class="card-label">CPL OK</div><div class="card-value green" id="c-ok">—</div></div>
+      <div class="card"><div class="card-label">Acima do limite</div><div class="card-value red" id="c-acima">—</div></div>
+      <div class="card"><div class="card-label">Limite de CPL</div><div class="card-value" id="c-limite">—</div></div>
+      <div class="card"><div class="card-label">Última atualização</div><div class="card-value" style="font-size:13px;padding-top:4px" id="c-hora">—</div></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title" id="periodo-label">Campanhas — Hoje</div>
+      <div class="table-wrap" id="tabela-wrap"><div class="loading">Carregando...</div></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Criativos Ativos</div>
+      <div class="table-wrap" id="criativos-wrap"><div class="loading">Carregando...</div></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Melhores Criativos (menor CPL)</div>
+      <div class="table-wrap" id="melhores-wrap"><div class="loading">Carregando...</div></div>
+    </div>
+  </div>
+
+  <!-- ── VIEW GOOGLE ADS ───────────────────────────── -->
+  <div class="view" id="view-google">
+    <div class="page-title">🔍 Google Ads</div>
+    <div class="page-sub">Monitoramento das campanhas ativas no Google</div>
+
+    <div class="periodo-tabs">
+      <div class="tab" id="gtab-1" onclick="trocarPeriodoGoogle(1)">Hoje (24h)</div>
+      <div class="tab active" id="gtab-7" onclick="trocarPeriodoGoogle(7)">7 dias</div>
+      <div class="tab" id="gtab-30" onclick="trocarPeriodoGoogle(30)">30 dias</div>
+    </div>
+
+    <div class="cards">
+      <div class="card"><div class="card-label">Campanhas ativas</div><div class="card-value" id="g-total">—</div></div>
+      <div class="card"><div class="card-label">Gasto total</div><div class="card-value purple" id="g-gasto">—</div></div>
+      <div class="card"><div class="card-label">Conversões</div><div class="card-value green" id="g-conv">—</div></div>
+      <div class="card"><div class="card-label">Cliques</div><div class="card-value" id="g-cliques">—</div></div>
+      <div class="card"><div class="card-label">Impressões</div><div class="card-value" id="g-impressoes">—</div></div>
+      <div class="card"><div class="card-label">CTR médio</div><div class="card-value" id="g-ctr">—</div></div>
+      <div class="card"><div class="card-label">CPC médio</div><div class="card-value" id="g-cpc">—</div></div>
+      <div class="card"><div class="card-label">Custo/Conversão</div><div class="card-value" id="g-cpa">—</div></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title" id="g-periodo-label">Google Ads — Últimos 7 dias</div>
+      <div class="table-wrap" id="g-tabela"><div class="loading">Carregando...</div></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Melhores Palavras-chave</div>
+      <div class="table-wrap" id="g-keywords"><div class="loading">Carregando...</div></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Observações e Melhorias</div>
+      <div id="g-insights" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+  </div>
+
+  <!-- ── VIEW FUNIL ─────────────────────────────────── -->
+  <div class="view" id="view-funil">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:8px">
+      <div>
+        <div class="page-title">🔻 Funil de Vendas</div>
+        <div class="page-sub">Acompanhe a conversão do lead até o cliente fechado</div>
+      </div>
+      <button onclick="abrirConfigFunil()" style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:9px;padding:8px 14px;font-size:12px;font-weight:600;color:#64748b;cursor:pointer;font-family:inherit;transition:all .15s" onmouseover="this.style.borderColor='#6366f1';this.style.color='#6366f1'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b'">✏️ Editar etapas</button>
+    </div>
+    <div class="periodo-tabs" id="tabs-funil" style="margin-top:16px">
+      <div class="tab active" onclick="trocarPeriodoFunil(1)">Hoje (24h)</div>
+      <div class="tab" onclick="trocarPeriodoFunil(7)">7 dias</div>
+      <div class="tab" onclick="trocarPeriodoFunil(15)">15 dias</div>
+    </div>
+
+    <!-- KPI cards -->
+    <div class="kpi-cards">
+      <div class="kpi-card"><div class="kpi-label">ROAS</div><div class="kpi-value green" id="f-roas">—</div><div class="kpi-sub" id="f-roas-sub">receita / gasto</div></div>
+      <div class="kpi-card"><div class="kpi-label">CAC</div><div class="kpi-value orange" id="f-cac">—</div><div class="kpi-sub">gasto / vendas</div></div>
+      <div class="kpi-card"><div class="kpi-label">Receita Total</div><div class="kpi-value purple" id="f-receita">—</div></div>
+      <div class="kpi-card"><div class="kpi-label">Gasto em Ads</div><div class="kpi-value" id="f-gasto">—</div></div>
+      <div class="kpi-card"><div class="kpi-label">Lucro (est.)</div><div class="kpi-value" id="f-lucro">—</div></div>
+      <div class="kpi-card"><div class="kpi-label">Custo por Agendamento</div><div class="kpi-value blue" id="f-cpr">—</div><div class="kpi-sub" id="f-cpr-sub">gasto / reuniões</div></div>
+    </div>
+
+    <!-- Layout funil + form -->
+    <div class="funil-layout">
+      <div class="funil-visual">
+        <h3>Funil de Conversão</h3>
+        <div id="funil-stages">
+          <div class="loading">Carregando...</div>
+        </div>
+        <div class="taxas-grid" id="taxas-grid"></div>
+      </div>
+
+      <div class="form-card">
+        <h3>Registrar Conversões</h3>
+        <div class="form-row">
+          <label id="lbl-reunioes">Reuniões agendadas</label>
+          <input type="number" id="inp-reunioes" min="0" placeholder="0"/>
+        </div>
+        <div class="form-row">
+          <label id="lbl-vendas">Vendas fechadas</label>
+          <input type="number" id="inp-vendas" min="0" placeholder="0"/>
+        </div>
+        <div class="form-row">
+          <label>Receita gerada (R$)</label>
+          <input type="number" id="inp-receita" min="0" step="0.01" placeholder="0,00"/>
+        </div>
+        <button class="btn-save" onclick="salvarConversoes()">Salvar</button>
+        <div class="save-msg" id="save-msg"></div>
+
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid #e2e8f0">
+          <div class="kpi-label" style="margin-bottom:10px">Resumo do período</div>
+          <div style="display:flex;flex-direction:column;gap:8px" id="resumo-sidebar"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── VIEW CONTRATOS ─────────────────────────────── -->
+  <div class="view" id="view-contratos">
+
+    <div class="page-title">📄 Contratos</div>
+    <div class="page-sub" style="margin-bottom:20px">Gere contratos e gerencie seu modelo personalizado</div>
+
+    <!-- Sub-abas -->
+    <div class="sub-tabs">
+      <button class="sub-tab active" onclick="trocarSubTab('sub-lista')">📋 Contratos</button>
+      <button class="sub-tab" onclick="trocarSubTab('sub-template')">⚙️ Meu Template</button>
+    </div>
+
+    <!-- SUB-ABA: Contratos -->
+    <div class="sub-view active" id="sub-lista">
+
+    <div class="ct-header">
+      <h2>Novo Contrato</h2>
+      <p>Preencha os dados do cliente e baixe o contrato em PDF ou Word</p>
+    </div>
+
+    <div class="contrato-layout">
+
+      <!-- Formulário -->
+      <div class="contrato-form">
+        <div class="ct-form-title">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#6366f1" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          Novo Contrato
+        </div>
+
+        <div class="form-section-label">Plano</div>
+        <div class="planos-grid" id="plano-btns">
+          <button type="button" class="plano-btn active" onclick="selecionarPlano(1)">Plano 1<span class="plano-valor">R$ 1.850</span></button>
+          <button type="button" class="plano-btn" onclick="selecionarPlano(2)">Plano 2<span class="plano-valor">R$ 2.200</span></button>
+          <button type="button" class="plano-btn" onclick="selecionarPlano(3)">Plano 3<span class="plano-valor">R$ 3.500</span></button>
+          <button type="button" class="plano-btn" onclick="selecionarPlano(4)">Social Media<span class="plano-valor">R$ 1.500</span></button>
+          <button type="button" class="plano-btn" onclick="selecionarPlano(0)" style="grid-column:span 2">✏️ Personalizado</button>
+        </div>
+
+        <div class="form-group">
+          <label>Serviços inclusos</label>
+          <textarea id="ct-servicos" rows="4">• A criação e o gerenciamento de campanhas de marketing mensal através das redes sociais Meta Ads e Google Ads, com geração ativa de contatos interessados nos serviços da contratante.
+• Captação e edição de criativos sob demanda das campanhas de gestão de tráfego.</textarea>
+        </div>
+
+        <hr class="form-divider"/>
+        <div class="form-section-label">Dados do Cliente</div>
+
+        <div class="form-group">
+          <label>Nome / Razão Social *</label>
+          <input type="text" id="ct-empresa" placeholder="Ex: Clínica Sorriso Ltda"/>
+        </div>
+        <div class="form-group">
+          <label>CNPJ</label>
+          <input type="text" id="ct-cnpj" placeholder="00.000.000/0001-00"/>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="form-group">
+            <label>Cidade do contratante</label>
+            <input type="text" id="ct-cidade-contratante" placeholder="Ex: São Paulo - SP"/>
+          </div>
+          <div class="form-group" style="grid-column:1/-1">
+            <label>Endereço</label>
+            <input type="text" id="ct-endereco" placeholder="Rua, nº, bairro, cidade - UF"/>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="form-group">
+            <label>Representante *</label>
+            <input type="text" id="ct-representante" placeholder="Nome completo"/>
+          </div>
+          <div class="form-group">
+            <label>CPF</label>
+            <input type="text" id="ct-cpf" placeholder="000.000.000-00"/>
+          </div>
+        </div>
+
+        <hr class="form-divider"/>
+        <div class="form-section-label">Valores</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="form-group">
+            <label>Valor mensal *</label>
+            <input type="text" id="ct-valor" placeholder="1.850,00" value="1.850,00" oninput="atualizarPreview()"/>
+          </div>
+          <div class="form-group">
+            <label>Desconto (opcional)</label>
+            <input type="text" id="ct-desconto" placeholder="0,00" oninput="atualizarPreview()"/>
+          </div>
+        </div>
+
+        <div class="valor-final-box">
+          <span>Valor final</span>
+          <span id="ct-valor-final">R$ 1.850,00</span>
+        </div>
+
+        <div class="toggle-row">
+          <label>Tem permuta?</label>
+          <label class="toggle">
+            <input type="checkbox" id="ct-tem-permuta" onchange="togglePermuta(this.checked)"/>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="form-group" id="grupo-permuta" style="display:none">
+          <label>Valor da permuta</label>
+          <input type="text" id="ct-permuta" placeholder="350,00"/>
+        </div>
+
+        <hr class="form-divider"/>
+        <div class="form-section-label">Duração do Contrato</div>
+        <div class="planos-grid" id="duracao-btns" style="margin-bottom:14px">
+          <button type="button" class="plano-btn" onclick="selecionarDuracao(3)">3 meses<span class="plano-valor" style="font-size:11px;color:inherit">trimestral</span></button>
+          <button type="button" class="plano-btn active" onclick="selecionarDuracao(6)">6 meses<span class="plano-valor" style="font-size:11px;color:inherit">semestral</span></button>
+          <button type="button" class="plano-btn" onclick="selecionarDuracao(8)">8 meses<span class="plano-valor" style="font-size:11px;color:inherit"></span></button>
+          <button type="button" class="plano-btn" onclick="selecionarDuracao(12)">12 meses<span class="plano-valor" style="font-size:11px;color:inherit">anual</span></button>
+        </div>
+
+        <hr class="form-divider"/>
+        <div class="form-section-label">Assinatura</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="form-group">
+            <label>Início do contrato *</label>
+            <input type="date" id="ct-inicio"/>
+          </div>
+          <div class="form-group">
+            <label>Data de assinatura *</label>
+            <input type="date" id="ct-data-assinatura"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Cidade</label>
+          <input type="text" id="ct-cidade" placeholder="Campo Grande - MS"/>
+        </div>
+
+        <div class="btns-gerar">
+          <button class="btn-gerar btn-pdf" onclick="gerarContrato('pdf')">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h4a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+            Baixar PDF
+          </button>
+          <button class="btn-gerar btn-docx" onclick="gerarContrato('docx')">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h4a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+            Baixar Word
+          </button>
+        </div>
+        <div class="contrato-status" id="ct-status"></div>
+      </div>
+
+      <!-- Preview -->
+      <div class="contrato-preview">
+        <div class="preview-titulo">Contrato de Prestação de Serviços</div>
+        <div class="preview-subtitulo">Gestão de Anúncios Online e Automação — 2oumais Marketing Digital</div>
+
+        <div class="preview-secao">1. Das Partes</div>
+        <div class="preview-p">
+          <strong>CONTRATANTE:</strong> <span class="preview-campo" id="pv-empresa">—</span>,
+          CNPJ <span class="preview-campo" id="pv-cnpj">—</span>,
+          <span class="preview-campo" id="pv-endereco">—</span>,
+          representado(a) por <span class="preview-campo" id="pv-representante">—</span>,
+          CPF <span class="preview-campo" id="pv-cpf">—</span>.
+        </div>
+        <div class="preview-p">
+          <strong>CONTRATADO:</strong> DOIS OU MAIS MARKETING DIGITAL, CNPJ 42.530.632/0001-07,
+          representado(a) por REZIÉLY BENITE DIAS.
+        </div>
+
+        <div class="preview-secao">2. Do Objeto</div>
+        <div class="preview-p" id="pv-servicos-preview">Serviços conforme plano selecionado.</div>
+
+        <div class="preview-secao">3. Do Prazo</div>
+        <div class="preview-p">Vigência de <span class="preview-campo" id="pv-duracao">6 (seis) meses</span>, com início em <span class="preview-campo" id="pv-inicio">—</span>.</div>
+
+        <div class="preview-secao">4. Do Valor</div>
+        <div class="preview-p">
+          Mensalidade: <span class="preview-campo" id="pv-valor">—</span>.
+          <span id="pv-permuta-wrap"> Permuta: <span class="preview-campo" id="pv-permuta">—</span>.</span>
+        </div>
+
+        <div class="preview-secao">5–9. Obrigações, Rescisão e Foro</div>
+        <div class="preview-p" style="color:#888;font-size:12px">Obrigações mútuas, propriedade intelectual, rescisão com 30 dias de aviso. Multa rescisória: 30% do valor restante do contrato. Isenção de multa caso não haja geração de contatos em 30 dias. Foro: Campo Grande - MS e <span id="pv-cidade-contratante" class="preview-campo">cidade do contratante</span>.</div>
+
+        <div class="preview-assinaturas">
+          <div class="assin-block">
+            <div class="assin-linha"></div>
+            <div class="assin-nome" id="pv-ass-contratante">CONTRATANTE</div>
+          </div>
+          <div class="assin-block">
+            <div class="assin-linha"></div>
+            <div class="assin-nome">DOIS OU MAIS MARKETING DIGITAL</div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:14px;font-size:11px;color:#aaa;font-family:sans-serif" id="pv-cidade-data">—</div>
+      </div>
+
+    </div>
+
+    <!-- ── Gestão de contratos ── -->
+    <div class="gestao-header">
+      <h3>📋 Contratos Cadastrados</h3>
+      <div class="gestao-filtros">
+        <button class="filtro-btn active" onclick="filtrarContratos('todos')">Todos</button>
+        <button class="filtro-btn" onclick="filtrarContratos('ativo')">✅ Ativos</button>
+        <button class="filtro-btn" onclick="filtrarContratos('a_vencer')">⚠️ A vencer</button>
+        <button class="filtro-btn" onclick="filtrarContratos('vencido')">❌ Vencidos</button>
+      </div>
+    </div>
+
+    <div class="contratos-summary">
+      <div class="cs-card"><div class="cs-icon ativo">✅</div><div><div class="cs-info-label">Ativos</div><div class="cs-info-value" id="gs-ativos">—</div></div></div>
+      <div class="cs-card"><div class="cs-icon a_vencer">⚠️</div><div><div class="cs-info-label">A vencer (30 dias)</div><div class="cs-info-value" id="gs-avencer">—</div></div></div>
+      <div class="cs-card"><div class="cs-icon vencido">❌</div><div><div class="cs-info-label">Vencidos</div><div class="cs-info-value" id="gs-vencidos">—</div></div></div>
+    </div>
+
+    <div class="contratos-lista" id="contratos-lista">
+      <div class="gestao-vazia"><div>📄</div>Nenhum contrato cadastrado ainda.<br>Gere um contrato pelo formulário acima.</div>
+    </div>
+
+    </div><!-- /sub-lista -->
+
+    <!-- SUB-ABA: Template -->
+    <div class="sub-view" id="sub-template">
+    <div class="tpl-page-title">⚙️ Meu Template de Contrato</div>
+    <div class="tpl-page-sub">Configure o modelo de contrato da sua empresa. Ele será usado em todos os contratos gerados.</div>
+
+    <div class="tpl-layout">
+
+      <!-- Editor -->
+      <div class="tpl-editor-card">
+
+        <!-- Instruções passo a passo -->
+        <div class="tpl-steps">
+          <div style="font-size:13px;font-weight:700;color:#4338ca;margin-bottom:4px">📖 Como configurar seu contrato</div>
+
+          <div class="tpl-step">
+            <div class="tpl-step-num">1</div>
+            <div class="tpl-step-text">
+              <strong>Cole o texto do seu contrato</strong> no editor abaixo. Pode ser qualquer contrato do Word, PDF ou arquivo de texto — copie o conteúdo e cole aqui.
+            </div>
+          </div>
+
+          <div class="tpl-step">
+            <div class="tpl-step-num">2</div>
+            <div class="tpl-step-text">
+              <strong>Identifique os campos que mudam</strong> de cliente para cliente — como nome, CNPJ, valor, data de início. Esses são os campos variáveis.
+            </div>
+          </div>
+
+          <div class="tpl-step">
+            <div class="tpl-step-num">3</div>
+            <div class="tpl-step-text">
+              <strong>Substitua cada campo variável</strong> pelo código correspondente da lista ao lado. Por exemplo, onde está o nome do cliente, apague e escreva <code>{{empresaNome}}</code>. Onde está o CNPJ, escreva <code>{{empresaCnpj}}</code>.
+            </div>
+          </div>
+
+          <div class="tpl-step">
+            <div class="tpl-step-num">4</div>
+            <div class="tpl-step-text">
+              <strong>Use # para títulos de seção.</strong> Qualquer linha que começa com <code>#</code> vira um título em negrito no contrato. Exemplo: <code># 1. DAS PARTES</code>
+            </div>
+          </div>
+
+          <div class="tpl-step">
+            <div class="tpl-step-num">5</div>
+            <div class="tpl-step-text">
+              <strong>Clique em Salvar Template</strong> e pronto! A partir daí, toda vez que gerar um contrato na aba Contratos, o sistema usará o seu modelo personalizado com os dados preenchidos automaticamente.
+            </div>
+          </div>
+
+          <div style="background:#e0e7ff;border-radius:8px;padding:10px 14px;font-size:12px;color:#3730a3;margin-top:4px">
+            💡 <strong>Dica:</strong> Não sabe qual código usar? Clique em qualquer campo na lista ao lado — ele será inserido automaticamente onde o cursor estiver no editor.
+          </div>
+        </div>
+
+        <div class="tpl-editor-label">Seu contrato (com os campos marcados)</div>
+        <textarea id="tpl-textarea" placeholder="Cole aqui o texto do seu contrato e substitua os campos variáveis pelos códigos da lista ao lado.
+
+Exemplo:
+
+# CONTRATO DE PRESTAÇÃO DE SERVIÇOS
+
+CONTRATANTE: {{empresaNome}}, inscrito no CNPJ {{empresaCnpj}}, com sede em {{empresaEndereco}}, representado por {{representanteNome}}, CPF {{representanteCpf}}.
+
+# 1. DO OBJETO
+
+{{servicos}}
+
+# 2. DO PRAZO
+
+O presente contrato terá vigência de {{duracao}}, com início em {{dataInicio}}.
+
+# 3. DO VALOR
+
+O valor mensal é de R$ {{valorMensal}}, devendo ser pago até o dia 10 de cada mês.
+
+{{cidadeAssinatura}}, {{dataAssinatura}}
+
+_______________________________
+{{empresaNome}} — CONTRATANTE
+
+_______________________________
+{{contratadoNome}} — CONTRATADO"></textarea>
+
+        <div class="tpl-save-row">
+          <button class="tpl-btn-save" onclick="salvarTemplate()">💾 Salvar Template</button>
+          <button class="tpl-btn-reset" onclick="resetarTemplate()">↺ Restaurar padrão</button>
+          <span class="tpl-save-msg" id="tpl-msg"></span>
+        </div>
+      </div>
+
+      <!-- Campos disponíveis -->
+      <div class="tpl-campos-card">
+        <div class="tpl-campos-title">📋 Campos disponíveis</div>
+        <div class="tpl-campos-sub">Clique em qualquer campo para inserir no editor onde o cursor estiver.</div>
+
+        <div class="tpl-grupo">
+          <div class="tpl-grupo-label">👤 Dados do Cliente</div>
+          <button class="tpl-campo-btn" onclick="inserirCampo('{{empresaNome}}')">
+            <div><div class="tpl-campo-code">{{empresaNome}}</div><div class="tpl-campo-desc">Nome ou razão social</div></div>
+            <span class="tpl-campo-icon">＋</span>
+          </button>
+          <button class="tpl-campo-btn" onclick="inserirCampo('{{empresaCnpj}}')">
+            <div><div class="tpl-campo-code">{{empresaCnpj}}</div><div class="tpl-campo-desc">CNPJ do cliente</div></div>
+            <span class="tpl-campo-icon">＋</span>
+          </button>
+          <button class="tpl-campo-btn" onclick="inserirCampo('{{empresaEndereco}}')">
+            <div><div class="tpl-campo-code">{{empresaEndereco}}</div><div class="tpl-campo-desc">Endereço completo</div></div>
+            <span class="tpl-campo-icon">＋</span>
+          </button>
+          <button class="tpl-campo-btn" onclick="inserirCampo('{{representanteNome}}')">
+            <div><div class="tpl-campo-code">{{representanteNome}}</div><div class="tpl-campo-desc">Nome do representante</div></div>
+            <span class="tpl-campo-icon">＋</span>
+          </button>
+          <button class="tpl-campo-btn" onclick="inserirCampo('{{representanteCpf}}')">
+            <div><div class="tpl-campo-code">{{representanteCpf}}</div><div class="tpl-campo-desc">CPF do representante</div></div>
+            <span class="tpl-campo-icon">＋</span>
+          </button>
+          <button class="tpl-campo-btn" onclick="inserirCampo('{{cidadeContratante}}')">
+            <div><div class="tpl-campo-code">{{cidadeContratante}}</div><div class="tpl-campo-desc">Cidade do cliente</div></div>
+            <span class="tpl-campo-icon">＋</span>
+          </button>
+        </div>
+
+        <div class="tpl-grupo">
+          <div class="tpl-grupo-label">💰 Financeiro</div>
+          <button class="tpl-campo-btn" onclick="inserirCampo('{{valorMensal}}')">
+            <div><div class="tpl-campo-code">{{valorMensal}}</div><div class="tpl-campo-desc">Valor mensal do contrato</div></div>
+            <span class="tpl-campo-icon">＋</span>
+          </button>
+          <button class="tpl-campo-btn" onclick="inserirCampo('{{valorFinal}}')">
+            <div><div class="tpl-campo-code">{{valorFinal}}</div><div class="tpl-campo-desc">Valor após desconto</div></div>
+            <span class="tpl-campo-icon">＋</span>
+          </button>
+          <button class="tpl-campo-btn" onclick="inserirCampo('{{desconto}}')">
+            <div><div class="tpl-campo-code">{{desconto}}</div><div class="tpl-campo-desc">Valor do desconto (se houver)</div></div>
+            <span class="tpl-campo-icon">＋</span>
+          </button>
+          <button class="tpl-campo-btn" onclick="inserirCampo('{{valorPermuta}}')">
+            <div><div class="tpl-campo-code">{{valorPermuta}}</div><div class="tpl-campo-desc">Valor da permuta (se houver)</div></div>
+            <span class="tpl-campo-icon">＋</span>
+          </button>
+        </div>
+
+        <div class="tpl-grupo">
+          <div class="tpl-grupo-label">📅 Datas e Prazo</div>
+          <button class="tpl-campo-btn" onclick="inserirCampo('{{dataInicio}}')">
+            <div><div class="tpl-campo-code">{{dataInicio}}</div><div class="tpl-campo-desc">Data de início do contrato</div></div>
+            <span class="tpl-campo-icon">＋</span>
+          </button>
+          <button class="tpl-campo-btn" onclick="inserirCampo('{{dataFim}}')">
+            <div><div class="tpl-campo-code">{{dataFim}}</div><div class="tpl-campo-desc">Data de encerramento</div></div>
+            <span class="tpl-campo-icon">＋</span>
+          </button>
+          <button class="tpl-campo-btn" onclick="inserirCampo('{{duracao}}')">
+            <div><div class="tpl-campo-code">{{duracao}}</div><div class="tpl-campo-desc">Duração (ex: 6 meses)</div></div>
+            <span class="tpl-campo-icon">＋</span>
+          </button>
+          <button class="tpl-campo-btn" onclick="inserirCampo('{{dataAssinatura}}')">
+            <div><div class="tpl-campo-code">{{dataAssinatura}}</div><div class="tpl-campo-desc">Data de assinatura</div></div>
+            <span class="tpl-campo-icon">＋</span>
+          </button>
+          <button class="tpl-campo-btn" onclick="inserirCampo('{{cidadeAssinatura}}')">
+            <div><div class="tpl-campo-code">{{cidadeAssinatura}}</div><div class="tpl-campo-desc">Cidade de assinatura</div></div>
+            <span class="tpl-campo-icon">＋</span>
+          </button>
+        </div>
+
+        <div class="tpl-grupo">
+          <div class="tpl-grupo-label">📦 Serviços</div>
+          <button class="tpl-campo-btn" onclick="inserirCampo('{{servicos}}')">
+            <div><div class="tpl-campo-code">{{servicos}}</div><div class="tpl-campo-desc">Lista de serviços do plano</div></div>
+            <span class="tpl-campo-icon">＋</span>
+          </button>
+        </div>
+
+        <div class="tpl-grupo">
+          <div class="tpl-grupo-label">🏢 Seus Dados (Contratado)</div>
+          <button class="tpl-campo-btn" onclick="inserirCampo('{{contratadoNome}}')">
+            <div><div class="tpl-campo-code">{{contratadoNome}}</div><div class="tpl-campo-desc">Nome da sua empresa</div></div>
+            <span class="tpl-campo-icon">＋</span>
+          </button>
+          <button class="tpl-campo-btn" onclick="inserirCampo('{{contratadoCnpj}}')">
+            <div><div class="tpl-campo-code">{{contratadoCnpj}}</div><div class="tpl-campo-desc">CNPJ da sua empresa</div></div>
+            <span class="tpl-campo-icon">＋</span>
+          </button>
+          <button class="tpl-campo-btn" onclick="inserirCampo('{{contratadoRepresentante}}')">
+            <div><div class="tpl-campo-code">{{contratadoRepresentante}}</div><div class="tpl-campo-desc">Seu nome (representante)</div></div>
+            <span class="tpl-campo-icon">＋</span>
+          </button>
+        </div>
+
+        <div class="tpl-insert-tip">Posicione o cursor no editor e clique no campo para inserir</div>
+      </div>
+
+    </div>
+    </div><!-- /sub-template -->
+
+  </div><!-- /view-contratos -->
+
+  <!-- ── VIEW CRM ───────────────────────────────────── -->
+  <div class="view" id="view-crm">
+    <div class="page-header">
+      <div class="page-title">🤝 CRM</div>
+      <div class="page-sub">Pipeline de vendas — arraste os leads entre as etapas</div>
+    </div>
+
+    <!-- WhatsApp connect card -->
+    <div class="wa-card" id="wa-card">
+      <div class="wa-icon">💬</div>
+      <div class="wa-info">
+        <div class="wa-info-title">WhatsApp</div>
+        <div class="wa-info-sub">Conecte para receber leads automaticamente</div>
+      </div>
+      <span class="wa-badge desconectado" id="wa-badge">⚪ Desconectado</span>
+      <button class="wa-btn wa-btn-conectar" id="wa-btn" onclick="waConectar()">Conectar</button>
+      <div class="wa-qr-wrap" id="wa-qr-wrap" style="display:none">
+        <img id="wa-qr-img" src="" alt="QR Code"/>
+      </div>
+    </div>
+
+    <div class="crm-toolbar">
+      <input class="crm-search" type="text" id="crm-search" placeholder="🔍 Buscar lead..." oninput="renderCRM()"/>
+      <div style="display:flex;gap:8px">
+        <button onclick="abrirConfigCRM()" style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:600;color:#64748b;cursor:pointer;font-family:inherit;transition:all .15s" onmouseover="this.style.borderColor='#6366f1';this.style.color='#6366f1'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b'">⚙️ Colunas</button>
+        <button id="btn-sync-meta" onclick="syncLeadsMeta()" style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:600;color:#16a34a;cursor:pointer;font-family:inherit;transition:all .15s">⬇️ Sincronizar Meta</button>
+        <button class="crm-btn-add" onclick="abrirModalCRM('novo', null)">＋ Novo Lead</button>
+      </div>
+    </div>
+
+    <div class="crm-board" id="crm-board">
+      <div class="loading">Carregando...</div>
+    </div>
+  </div>
+
+  <!-- Agenda -->
+  <div class="view" id="view-agenda">
+    <div class="page-header">
+      <div class="page-title">📅 Agenda</div>
+      <div class="page-sub">Ligações, retornos e reuniões agendadas</div>
+    </div>
+    <div class="agenda-toolbar">
+      <div></div>
+      <button class="agenda-add-btn" onclick="abrirNovoAgendamento()">＋ Novo Agendamento</button>
+    </div>
+    <div id="agenda-lista"><div class="agenda-empty">Nenhum agendamento ainda.</div></div>
+  </div>
+
+</div>
+
+<script>
+  const INTERVALO = 5 * 60 * 1000;
+  let periodoAtual = 1;
+  let periodoFunilAtual = 1;
+  let proximaAtualizacao = Date.now() + INTERVALO;
+  let cacheData = {};
+  let conversoes = {};
+
+  const periodoLabels = { 1: 'Hoje (últimas 24h)', 7: 'Últimos 7 dias', 15: 'Últimos 15 dias' };
+
+  // ── Sub-abas ───────────────────────────────────────────
+  function trocarSubTab(id) {
+    document.querySelectorAll('.sub-tab').forEach((t, i) => {
+      t.classList.toggle('active', t.getAttribute('onclick') === `trocarSubTab('${id}')`);
+    });
+    document.querySelectorAll('.sub-view').forEach(v => v.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if (id === 'sub-template') carregarTemplate();
+    if (id === 'sub-lista') carregarContratos();
+  }
+
+  // ── Config Funil ───────────────────────────────────────
+  let funilLabels = ['Impressões', 'Cliques', 'Leads', 'Reuniões', 'Vendas'];
+
+  async function carregarConfigFunil() {
+    try {
+      const res = await fetch('/api/funil/config');
+      funilLabels = await res.json();
+    } catch (_) {}
+    // Atualiza labels do form
+    const el4 = document.getElementById('lbl-reunioes');
+    const el5 = document.getElementById('lbl-vendas');
+    if (el4) el4.textContent = funilLabels[3] || 'Reuniões';
+    if (el5) el5.textContent = funilLabels[4] || 'Vendas';
+  }
+
+  function abrirConfigFunil() {
+    const nomes = ['Impressões (Meta Ads)', 'Cliques (Meta Ads)', 'Leads (Meta Ads)', funilLabels[3] || 'Reuniões', funilLabels[4] || 'Vendas'];
+    document.getElementById('config-funil-lista').innerHTML = nomes.map((nome, i) => `
+      <div style="margin-bottom:10px">
+        <label style="font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:4px">Etapa ${i+1}</label>
+        <input class="config-col-input" id="funil-label-${i}" value="${nome}" ${i < 3 ? 'disabled style="background:#f1f5f9;color:#94a3b8"' : ''} placeholder="Nome da etapa" style="width:100%"/>
+        ${i < 3 ? '<div style="font-size:11px;color:#cbd5e1;margin-top:3px">Valor vem automaticamente do Meta Ads</div>' : ''}
+      </div>`).join('');
+    document.getElementById('modal-config-funil').classList.remove('hidden');
+  }
+
+  function fecharConfigFunil() {
+    document.getElementById('modal-config-funil').classList.add('hidden');
+  }
+
+  async function salvarConfigFunil() {
+    const novos = funilLabels.slice();
+    novos[3] = document.getElementById('funil-label-3')?.value.trim() || 'Reuniões';
+    novos[4] = document.getElementById('funil-label-4')?.value.trim() || 'Vendas';
+    await fetch('/api/funil/config', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(novos) });
+    funilLabels = novos;
+    fecharConfigFunil();
+    const el4 = document.getElementById('lbl-reunioes');
+    const el5 = document.getElementById('lbl-vendas');
+    if (el4) el4.textContent = funilLabels[3];
+    if (el5) el5.textContent = funilLabels[4];
+    // Re-renderiza o funil se tiver dados em cache
+    const p = periodoFunilAtual;
+    if (cacheData[p]) renderFunil(cacheData[p], conversoes[String(p)] || {});
+  }
+
+  // ── Config CRM Colunas ─────────────────────────────────
+  // ── Config CRM ─────────────────────────────────────────
+
+  function lerLabelsDoModal() {
+    CRM_COLUNAS.forEach((c, i) => {
+      const inp = document.getElementById('cfg-label-' + i);
+      if (inp) c.label = inp.value.trim() || c.label;
+    });
+  }
+
+  async function abrirConfigCRM() {
+    try {
+      const res = await fetch('/api/crm/config');
+      CRM_COLUNAS = await res.json();
+    } catch (_) {}
+    renderConfigCRMLista();
+    document.getElementById('modal-config-crm').classList.remove('hidden');
+  }
+
+  function renderConfigCRMLista() {
+    const total = CRM_COLUNAS.length;
+    document.getElementById('config-crm-lista').innerHTML = CRM_COLUNAS.map((col, i) => `
+      <div class="config-col-row">
+        <span class="config-col-handle" title="Arraste para reordenar">⠿</span>
+        <input class="config-col-input" id="cfg-label-${i}" value="${col.label}" placeholder="Nome da coluna"/>
+        <button class="config-col-up"   onclick="moverColunaConfig(${i},-1)" ${i===0?'disabled style="opacity:.3"':''} title="Subir">▲</button>
+        <button class="config-col-down" onclick="moverColunaConfig(${i}, 1)" ${i===total-1?'disabled style="opacity:.3"':''} title="Descer">▼</button>
+        <button onclick="excluirColunaConfig(${i})" title="Excluir coluna"
+          style="background:none;border:1.5px solid #fecaca;border-radius:6px;padding:4px 8px;cursor:pointer;color:#dc2626;font-size:13px;transition:all .15s"
+          onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='none'">🗑</button>
+      </div>`).join('') + `
+      <button onclick="adicionarColunaConfig()"
+        style="width:100%;margin-top:4px;padding:10px;background:transparent;border:1.5px dashed #c7d2fe;border-radius:9px;color:#6366f1;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s"
+        onmouseover="this.style.background='#f5f3ff'" onmouseout="this.style.background='transparent'">
+        ＋ Adicionar coluna
+      </button>`;
+  }
+
+  function moverColunaConfig(i, dir) {
+    lerLabelsDoModal();
+    const j = i + dir;
+    if (j < 0 || j >= CRM_COLUNAS.length) return;
+    [CRM_COLUNAS[i], CRM_COLUNAS[j]] = [CRM_COLUNAS[j], CRM_COLUNAS[i]];
+    renderConfigCRMLista();
+  }
+
+  function excluirColunaConfig(i) {
+    if (CRM_COLUNAS.length <= 1) { alert('Precisa ter ao menos 1 coluna.'); return; }
+    lerLabelsDoModal();
+    CRM_COLUNAS.splice(i, 1);
+    renderConfigCRMLista();
+  }
+
+  function adicionarColunaConfig() {
+    lerLabelsDoModal();
+    CRM_COLUNAS.push({ key: 'col_' + Date.now(), label: 'Nova Coluna' });
+    renderConfigCRMLista();
+    // Foca no novo input
+    setTimeout(() => {
+      const inp = document.getElementById('cfg-label-' + (CRM_COLUNAS.length - 1));
+      if (inp) { inp.focus(); inp.select(); }
+    }, 50);
+  }
+
+  function fecharConfigCRM() {
+    document.getElementById('modal-config-crm').classList.add('hidden');
+  }
+
+  async function salvarConfigCRM() {
+    lerLabelsDoModal();
+    await fetch('/api/crm/config', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(CRM_COLUNAS)
+    });
+    fecharConfigCRM();
+    renderCRM();
+  }
+
+  // ── Drag & Drop CRM ────────────────────────────────────
+
+  let dragLeadId = null;
+
+  function onDragStart(e, leadId) {
+    dragLeadId = leadId;
+    e.dataTransfer.effectAllowed = 'move';
+    e.currentTarget.style.opacity = '0.4';
+  }
+
+  function onDragEnd(e) {
+    e.currentTarget.style.opacity = '';
+  }
+
+  function onDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    e.currentTarget.style.background = '#ede9fe';
+  }
+
+  function onDragLeave(e) {
+    e.currentTarget.style.background = '';
+  }
+
+  async function onDrop(e, etapa) {
+    e.preventDefault();
+    e.currentTarget.style.background = '';
+    if (!dragLeadId) return;
+    await fetch('/api/crm/' + dragLeadId, {
+      method: 'PATCH',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ etapa })
+    });
+    dragLeadId = null;
+    carregarCRM();
+  }
+
+  function brl(v) { return v != null ? 'R$ ' + parseFloat(v).toFixed(2) : '—'; }
+  function brlK(v) { return v != null ? 'R$ ' + parseFloat(v).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}) : '—'; }
+  function pctStr(v) { return v != null ? parseFloat(v).toFixed(1) + '%' : '—'; }
+
+  // ── Campanhas ──────────────────────────────────────────
+
+  function badge(status) {
+    const map = { ok:['badge-ok','CPL OK'], acima_limite:['badge-acima','Acima do limite'], pausada:['badge-pausada','Pausada'], sem_dados:['badge-sem','Sem dados'], sem_leads:['badge-sem','Sem leads'], erro:['badge-acima','Erro'] };
+    const [cls, label] = map[status] || ['badge-sem', status];
+    return `<span class="badge ${cls}">${label}</span>`;
+  }
+  function badgeStatus(s) {
+    const map = { ACTIVE:['badge-active','Ativo'], PAUSED:['badge-paused','Pausado'] };
+    const [cls, label] = (map[s] || ['badge-sem', s||'—']);
+    return `<span class="badge ${cls}">${label}</span>`;
+  }
+  function sugestoesHtml(s) {
+    if (!s || !s.length) return '—';
+    return s.map(t => { const b = t.startsWith('Excelente') || t.startsWith('Performance'); return `<div class="sug-item${b?' bom':''}">${t}</div>`; }).join('');
+  }
+  function thumbHtml(t) {
+    return t ? `<img class="thumb" src="${t}" onerror="this.style.display='none'">` : `<div class="thumb-placeholder">🎨</div>`;
+  }
+  function ctrBarHtml(ctr) {
+    const fill = Math.min(ctr * 10, 100);
+    return `<div>${pctStr(ctr)}<div class="ctr-bar"><div class="ctr-fill" style="width:${fill}%"></div></div></div>`;
+  }
+
+  function renderTabela(campanhas) {
+    if (!campanhas || !campanhas.length) return '<div class="loading">Nenhuma campanha encontrada.</div>';
+    return `<table><thead><tr><th>Campanha</th><th>Gasto</th><th>Impressões</th><th>Cliques</th><th>Leads</th><th>CPL</th><th>Status</th><th>Observações</th></tr></thead><tbody>${
+      campanhas.map(c => `<tr>
+        <td><div class="nome-camp" title="${c.nome}">${c.nome}</div></td>
+        <td>${brl(c.gasto)}</td>
+        <td>${(c.impressoes||0).toLocaleString('pt-BR')}</td>
+        <td>${(c.cliques||0).toLocaleString('pt-BR')}</td>
+        <td>${c.leads??'—'}</td>
+        <td>${c.cpl!=null?brl(c.cpl):'—'}</td>
+        <td>${badge(c.status)}</td>
+        <td><div class="sugestoes">${sugestoesHtml(c.sugestoes)}</div></td>
+      </tr>`).join('')
+    }</tbody></table>`;
+  }
+
+  function renderCriativos(anuncios) {
+    if (!anuncios || !anuncios.length) return '<div class="empty">Nenhum anúncio encontrado.</div>';
+    return `<table><thead><tr><th>Criativo</th><th>Campanha</th><th>Status</th><th>Gasto</th><th>Impressões</th><th>Cliques</th><th>CTR</th><th>CPC</th><th>Leads</th><th>CPL</th></tr></thead><tbody>${
+      anuncios.map(a => `<tr>
+        <td><div class="ad-info">${thumbHtml(a.thumbnail)}<div><div class="ad-nome" title="${a.nome}">${a.nome}</div>${a.titulo?`<div class="ad-titulo">${a.titulo}</div>`:''}</div></div></td>
+        <td><div class="nome-camp" title="${a.campanhaNome}">${a.campanhaNome}</div></td>
+        <td>${badgeStatus(a.status)}</td>
+        <td>${brl(a.gasto)}</td>
+        <td>${(a.impressoes||0).toLocaleString('pt-BR')}</td>
+        <td>${(a.cliques||0).toLocaleString('pt-BR')}</td>
+        <td>${ctrBarHtml(a.ctr)}</td>
+        <td>${a.cpc>0?brl(a.cpc):'—'}</td>
+        <td>${a.leads>0?a.leads:'—'}</td>
+        <td>${a.cpl!=null?brl(a.cpl):'—'}</td>
+      </tr>`).join('')
+    }</tbody></table>`;
+  }
+
+  function renderMelhores(anuncios) {
+    if (!anuncios || !anuncios.length) return '<div class="empty">Nenhum criativo com leads no período.</div>';
+    return `<table><thead><tr><th>#</th><th>Criativo</th><th>Campanha</th><th>Leads</th><th>CPL</th><th>Gasto</th><th>CTR</th></tr></thead><tbody>${
+      anuncios.map((a,i) => `<tr>
+        <td style="font-weight:700">${['🥇','🥈','🥉'][i]||'#'+(i+1)}</td>
+        <td><div class="ad-info">${thumbHtml(a.thumbnail)}<div><div class="ad-nome">${a.nome}</div>${a.titulo?`<div class="ad-titulo">${a.titulo}</div>`:''}</div></div></td>
+        <td><div class="nome-camp">${a.campanhaNome}</div></td>
+        <td style="color:#16a34a;font-weight:700">${a.leads}</td>
+        <td style="color:#16a34a;font-weight:700">${brl(a.cpl)}</td>
+        <td>${brl(a.gasto)}</td>
+        <td>${ctrBarHtml(a.ctr)}</td>
+      </tr>`).join('')
+    }</tbody></table>`;
+  }
+
+  // ── Funil ──────────────────────────────────────────────
+
+  function renderFunil(data, conv) {
+    const r = data.resumo || {};
+    const impressoes = data.campanhas ? data.campanhas.reduce((s,c) => s + (c.impressoes||0), 0) : 0;
+    const cliques    = data.campanhas ? data.campanhas.reduce((s,c) => s + (c.cliques||0), 0) : 0;
+    const leads      = r.totalLeads || 0;
+    const gasto      = r.totalGasto || 0;
+    const reunioes   = conv.reunioes || 0;
+    const vendas     = conv.vendas || 0;
+    const receita    = conv.receita || 0;
+    const lucro      = receita - gasto;
+    const roas       = gasto > 0 ? receita / gasto : null;
+    const cac        = vendas > 0 ? gasto / vendas : null;
+    const cpr        = reunioes > 0 ? gasto / reunioes : null;
+
+    // KPIs
+    const roasEl = document.getElementById('f-roas');
+    roasEl.textContent = roas != null ? roas.toFixed(2) + 'x' : '—';
+    roasEl.className = 'kpi-value ' + (roas == null ? '' : roas >= 3 ? 'green' : roas >= 1 ? 'yellow' : 'red');
+    document.getElementById('f-roas-sub').textContent = roas != null ? `R$${receita.toFixed(0)} / R$${gasto.toFixed(0)}` : 'sem receita registrada';
+    document.getElementById('f-cac').textContent = cac != null ? brl(cac) : '—';
+    document.getElementById('f-receita').textContent = brlK(receita);
+    document.getElementById('f-gasto').textContent = brlK(gasto);
+    const lucroEl = document.getElementById('f-lucro');
+    lucroEl.textContent = receita > 0 ? brlK(lucro) : '—';
+    lucroEl.className = 'kpi-value ' + (lucro > 0 ? 'green' : lucro < 0 ? 'red' : '');
+    document.getElementById('f-cpr').textContent = cpr != null ? brl(cpr) : '—';
+    document.getElementById('f-cpr-sub').textContent = reunioes > 0 ? `R$${gasto.toFixed(0)} / ${reunioes} agend.` : 'sem agendamentos';
+
+    // Etapas do funil (labels personalizáveis)
+    const stages = [
+      { label: funilLabels[0] || 'Impressões', valor: impressoes },
+      { label: funilLabels[1] || 'Cliques',    valor: cliques    },
+      { label: funilLabels[2] || 'Leads',      valor: leads      },
+      { label: funilLabels[3] || 'Reuniões',   valor: reunioes   },
+      { label: funilLabels[4] || 'Vendas',     valor: vendas     },
+    ];
+
+    const max = Math.max(...stages.map(s => s.valor), 1);
+
+    // Funil visual real — trapézios em cascata
+    const widths = [100, 82, 65, 48, 32]; // larguras decrescentes %
+    const stagesHtml = `<div class="funil-real">${stages.map((s, i) => {
+      const prev = i > 0 ? stages[i-1].valor : null;
+      const convTxt = prev != null && prev > 0
+        ? `${((s.valor / prev) * 100).toFixed(1)}% do estágio anterior`
+        : '';
+      const totalPct = stages[0].valor > 0
+        ? `${((s.valor / stages[0].valor) * 100).toFixed(1)}% do topo`
+        : '';
+      return `
+        ${i > 0 ? `
+        <div class="funil-gap">
+          <div class="funil-gap-line"></div>
+          <div class="funil-gap-pct">${convTxt ? '↓ ' + convTxt : '↓'}</div>
+          <div class="funil-gap-line"></div>
+        </div>` : ''}
+        <div class="funil-step-wrap">
+          <div class="funil-step-block fs-${i+1}" style="width:${widths[i]}%">
+            <div class="funil-step-left">
+              <div class="funil-step-nome">${s.label}</div>
+              ${i > 0 && totalPct ? `<div class="funil-step-conv">${totalPct}</div>` : ''}
+            </div>
+            <div class="funil-step-right">
+              <div class="funil-step-num">${s.valor > 0 ? s.valor.toLocaleString('pt-BR') : '—'}</div>
+            </div>
+          </div>
+        </div>`;
+    }).join('')}</div>`;
+
+    document.getElementById('funil-stages').innerHTML = stagesHtml;
+
+    // Taxas
+    const txClickImpressao = impressoes > 0 ? ((cliques/impressoes)*100) : null;
+    const txLeadClick      = cliques > 0    ? ((leads/cliques)*100) : null;
+    const txReuniaoLead    = leads > 0      ? ((reunioes/leads)*100) : null;
+    const txVendaReuniao   = reunioes > 0   ? ((vendas/reunioes)*100) : null;
+    const txVendaLead      = leads > 0      ? ((vendas/leads)*100) : null;
+
+    document.getElementById('taxas-grid').innerHTML = [
+      { label: `CTR (${funilLabels[0]||'Imp'} → ${funilLabels[1]||'Clique'})`, v: txClickImpressao, desc: `${cliques.toLocaleString('pt-BR')} cliques`, custo: null },
+      { label: `Lead Rate (${funilLabels[1]||'Cli'} → ${funilLabels[2]||'Lead'})`, v: txLeadClick, desc: `${leads} leads`, custo: null },
+      { label: `${funilLabels[2]||'Lead'} → ${funilLabels[3]||'Reunião'}`, v: txReuniaoLead, desc: `${reunioes} ${funilLabels[3]||'agend.'}`, custo: cpr },
+      { label: `${funilLabels[3]||'Reunião'} → ${funilLabels[4]||'Venda'}`, v: txVendaReuniao, desc: `${vendas} ${funilLabels[4]||'vendas'}`, custo: cac },
+      { label: `Conv. Total (${funilLabels[2]||'Lead'} → ${funilLabels[4]||'Venda'})`, v: txVendaLead, desc: `${vendas} / ${leads} ${funilLabels[2]||'leads'}`, custo: null },
+    ].map(t => `
+      <div class="taxa-card">
+        <div class="taxa-label">${t.label}</div>
+        <div class="taxa-value" style="color:${t.v==null?'#94a3b8':t.v>=10?'#16a34a':t.v>=3?'#d97706':'#dc2626'}">${t.v!=null?t.v.toFixed(1)+'%':'—'}</div>
+        <div class="taxa-desc">${t.desc}</div>
+        ${t.custo!=null?`<div style="margin-top:6px;font-size:12px;color:#6366f1;font-weight:600">Custo: ${brl(t.custo)}</div>`:''}
+      </div>`).join('');
+
+    // Resumo sidebar
+    document.getElementById('resumo-sidebar').innerHTML = [
+      { label: 'Leads', v: leads, color: '#6366f1' },
+      { label: 'Reuniões', v: reunioes, color: '#f59e0b' },
+      { label: 'Vendas', v: vendas, color: '#16a34a' },
+      { label: 'Gasto', v: brlK(gasto), color: '#7c3aed' },
+      { label: 'Receita', v: receita > 0 ? brlK(receita) : '—', color: '#16a34a' },
+    ].map(item => `
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:12px;color:#64748b">${item.label}</span>
+        <span style="font-size:14px;font-weight:700;color:${item.color}">${item.v}</span>
+      </div>`).join('');
+
+    // Preenche form
+    document.getElementById('inp-reunioes').value = reunioes || '';
+    document.getElementById('inp-vendas').value   = vendas || '';
+    document.getElementById('inp-receita').value  = receita || '';
+  }
+
+  async function salvarConversoes() {
+    const dias = periodoFunilAtual;
+    const body = {
+      dias,
+      reunioes: parseInt(document.getElementById('inp-reunioes').value) || 0,
+      vendas:   parseInt(document.getElementById('inp-vendas').value)   || 0,
+      receita:  parseFloat(document.getElementById('inp-receita').value) || 0,
+    };
+    await fetch('/api/conversoes', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    conversoes[String(dias)] = body;
+    const msg = document.getElementById('save-msg');
+    msg.textContent = 'Salvo!';
+    setTimeout(() => msg.textContent = '', 2000);
+    if (cacheData[dias]) renderFunil(cacheData[dias], conversoes[String(dias)] || {});
+  }
+
+  // ── Dados / atualização ────────────────────────────────
+
+  async function atualizar(periodo) {
+    try {
+      const [res, convRes] = await Promise.all([
+        fetch('/api/campanhas?dias=' + periodo),
+        fetch('/api/conversoes'),
+      ]);
+      if (!res.ok) throw new Error('Erro ' + res.status);
+      const data = await res.json();
+      conversoes = await convRes.json();
+      cacheData[periodo] = data;
+
+      if (viewAtual === 'campanhas') {
+        const r = data.resumo;
+        document.getElementById('c-total').textContent     = r.total;
+        document.getElementById('c-gasto').textContent     = brl(r.totalGasto);
+        document.getElementById('c-leads').textContent     = r.totalLeads;
+        document.getElementById('c-cpl-medio').textContent = r.cplMedio ? brl(r.cplMedio) : '—';
+        document.getElementById('c-ok').textContent        = r.ok;
+        document.getElementById('c-acima').textContent     = r.acima;
+        document.getElementById('c-limite').textContent    = brl(r.cplLimite);
+        document.getElementById('c-hora').textContent      = new Date(data.atualizadoEm).toLocaleTimeString('pt-BR');
+        document.getElementById('periodo-label').textContent = 'Campanhas — ' + periodoLabels[periodo];
+        document.getElementById('tabela-wrap').innerHTML    = renderTabela(data.campanhas);
+        document.getElementById('criativos-wrap').innerHTML = renderCriativos(data.anuncios);
+        document.getElementById('melhores-wrap').innerHTML  = renderMelhores(data.melhoresAnuncios);
+      } else {
+        renderFunil(data, conversoes[String(periodo)] || {});
+      }
+    } catch (e) {
+      document.getElementById(viewAtual === 'campanhas' ? 'tabela-wrap' : 'funil-stages').innerHTML =
+        `<div class="error-msg">Erro: ${e.message}</div>`;
+    }
+    proximaAtualizacao = Date.now() + INTERVALO;
+  }
+
+  // ── Navegação ──────────────────────────────────────────
+
+  let viewAtual = 'campanhas';
+  let googlePeriodoAtual = 7;
+
+  function trocarView(view) {
+    if (viewAtual === 'crm' && view !== 'crm') pararPollWA();
+    viewAtual = view;
+    document.querySelectorAll('.sidebar-item').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('onclick') === `trocarView('${view}')`);
+    });
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + view).classList.add('active');
+    if (view === 'contratos') {
+      carregarContratos();
+    } else if (view === 'crm') {
+      carregarCRM();
+      iniciarPollWA();
+    } else if (view === 'agenda') {
+      carregarAgenda();
+    } else if (view === 'google') {
+      console.log('[Google Ads] trocarView chamou carregarGoogleAds, periodo=', googlePeriodoAtual);
+      carregarGoogleAds(googlePeriodoAtual);
+    } else {
+      const periodo = view === 'funil' ? periodoFunilAtual : periodoAtual;
+      atualizar(periodo);
+    }
+  }
+
+  // ── CRM ────────────────────────────────────────────────
+
+  let crmLeads = [];
+
+  // CRM_COLUNAS é mutável — carregado da API e editável pelo usuário
+  let CRM_COLUNAS = [
+    { key: 'novo',     label: 'Novo Lead'       },
+    { key: 'contato',  label: 'Contato Feito'   },
+    { key: 'reuniao',  label: 'Reunião Agendada'},
+    { key: 'proposta', label: 'Proposta Enviada'},
+    { key: 'fechado',  label: 'Fechado ✅'       },
+    { key: 'perdido',  label: 'Perdido ❌'       },
+  ];
+
+  // ── WhatsApp ──────────────────────────────────────────────────────────────
+  let waPollTimer = null;
+
+  async function atualizarStatusWA() {
+    try {
+      const res = await fetch('/api/whatsapp/status');
+      const { status, qr } = await res.json();
+
+      const badge = document.getElementById('wa-badge');
+      const btn   = document.getElementById('wa-btn');
+      const qrWrap = document.getElementById('wa-qr-wrap');
+      const qrImg  = document.getElementById('wa-qr-img');
+
+      badge.className = `wa-badge ${status}`;
+      if (status === 'conectado') {
+        badge.textContent = '🟢 Conectado';
+        btn.className = 'wa-btn wa-btn-desconectar';
+        btn.textContent = 'Desconectar';
+        btn.onclick = waDesconectar;
+        qrWrap.style.display = 'none';
+        // Poll mais devagar quando conectado — detecta queda
+        if (!waPollTimer) waPollTimer = setInterval(atualizarStatusWA, 5000);
+      } else if (status === 'aguardando_qr') {
+        badge.textContent = '🟡 Aguardando QR';
+        btn.className = 'wa-btn wa-btn-conectar';
+        btn.textContent = 'Aguardando...';
+        btn.onclick = null;
+        if (qr) { qrImg.src = qr; qrWrap.style.display = 'flex'; }
+        // Poll rápido enquanto aguarda scan
+        clearInterval(waPollTimer);
+        waPollTimer = setInterval(atualizarStatusWA, 2000);
+      } else {
+        badge.textContent = '⚪ Desconectado';
+        btn.className = 'wa-btn wa-btn-conectar';
+        btn.textContent = 'Conectar';
+        btn.onclick = waConectar;
+        qrWrap.style.display = 'none';
+        clearInterval(waPollTimer); waPollTimer = null;
+      }
+    } catch (_) {}
+  }
+
+  function iniciarPollWA() {
+    clearInterval(waPollTimer);
+    waPollTimer = null;
+    atualizarStatusWA();
+  }
+
+  function pararPollWA() {
+    clearInterval(waPollTimer);
+    waPollTimer = null;
+  }
+
+  async function waConectar() {
+    const btn = document.getElementById('wa-btn');
+    btn.textContent = 'Iniciando...';
+    btn.onclick = null;
+    await fetch('/api/whatsapp/conectar', { method: 'POST' });
+    clearInterval(waPollTimer);
+    waPollTimer = setInterval(atualizarStatusWA, 2000);
+    await atualizarStatusWA();
+  }
+
+  async function waDesconectar() {
+    await fetch('/api/whatsapp/desconectar', { method: 'POST' });
+    await atualizarStatusWA();
+  }
+
+  async function syncLeadsMeta() {
+    const btn = document.getElementById('btn-sync-meta');
+    btn.textContent = '⏳ Sincronizando...';
+    btn.disabled = true;
+    try {
+      const res = await fetch('/api/crm/sync-meta', { method: 'POST' });
+      const data = await res.json();
+      if (data.erro) throw new Error(data.erro);
+      crmLeads = data.crm;
+      renderCRM();
+      btn.textContent = '✓ Sincronizado!';
+      setTimeout(() => { btn.textContent = '⬇️ Sincronizar Meta'; btn.disabled = false; }, 3000);
+    } catch (e) {
+      btn.textContent = '⚠️ Erro';
+      btn.style.color = '#dc2626';
+      setTimeout(() => { btn.textContent = '⬇️ Sincronizar Meta'; btn.style.color = '#16a34a'; btn.disabled = false; }, 3000);
+    }
+  }
+
+  async function carregarCRM() {
+    try {
+      const [leadsRes, configRes] = await Promise.all([fetch('/api/crm'), fetch('/api/crm/config')]);
+      crmLeads = await leadsRes.json();
+      CRM_COLUNAS = await configRes.json();
+    } catch (_) {
+      crmLeads = [];
+    }
+    renderCRM();
+  }
+
+  function renderCRM() {
+    const q = (document.getElementById('crm-search')?.value || '').toLowerCase();
+    const filtrados = q ? crmLeads.filter(l =>
+      (l.nome||'').toLowerCase().includes(q) ||
+      (l.empresa||'').toLowerCase().includes(q) ||
+      (l.fonte||'').toLowerCase().includes(q)
+    ) : crmLeads;
+
+    const board = document.getElementById('crm-board');
+    // Paleta de cores para colunas (por index, suporta colunas customizadas)
+    const COR_BORDA  = ['#6366f1','#06b6d4','#f59e0b','#8b5cf6','#22c55e','#ef4444','#f97316','#14b8a6','#ec4899','#84cc16'];
+    const COR_DOT    = COR_BORDA;
+    const COR_CNT_BG = ['#ede9fe','#cffafe','#fef9c3','#ede9fe','#dcfce7','#fee2e2','#ffedd5','#ccfbf1','#fce7f3','#d9f99d'];
+    const COR_CNT_TX = ['#6366f1','#0891b2','#d97706','#7c3aed','#16a34a','#dc2626','#ea580c','#0d9488','#db2777','#65a30d'];
+
+    board.innerHTML = CRM_COLUNAS.map((col, ci) => {
+      const leads = filtrados.filter(l => l.etapa === col.key);
+      const totalValor = leads.reduce((s, l) => s + (parseFloat((l.valor||'0').replace(/\./g,'').replace(',','.')) || 0), 0);
+      const corBorda = COR_BORDA[ci % COR_BORDA.length];
+      const corDot   = COR_DOT[ci % COR_DOT.length];
+      const cntBg    = COR_CNT_BG[ci % COR_CNT_BG.length];
+      const cntTx    = COR_CNT_TX[ci % COR_CNT_TX.length];
+      return `
+        <div class="crm-col"
+          ondragover="onDragOver(event)"
+          ondragleave="onDragLeave(event)"
+          ondrop="onDrop(event,'${col.key}')">
+          <div class="crm-col-header" style="border-bottom:2px solid ${corBorda}">
+            <div class="crm-col-left">
+              <div class="crm-col-dot" style="background:${corDot}"></div>
+              <div class="crm-col-title">${col.label}</div>
+            </div>
+            <span class="crm-col-count" style="background:${cntBg};color:${cntTx}">${leads.length}</span>
+          </div>
+          ${totalValor > 0 ? `<div style="font-size:11px;color:#94a3b8;margin-bottom:8px;font-weight:600">R$ ${totalValor.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>` : ''}
+          <div class="crm-cards">
+            ${leads.map(l => `
+              <div class="crm-card"
+                draggable="true"
+                ondragstart="onDragStart(event,'${l.id}')"
+                ondragend="onDragEnd(event)"
+                onclick="abrirModalCRM('${col.key}','${l.id}')">
+                <div class="crm-card-name">${l.nome}</div>
+                ${l.empresa ? `<div class="crm-card-empresa">${l.empresa}</div>` : ''}
+                ${l.valor ? `<div class="crm-card-valor">R$ ${l.valor}</div>` : ''}
+                <div class="crm-card-footer">
+                  <span class="crm-card-fonte">${l.fonte || '—'}</span>
+                  <div style="display:flex;align-items:center;gap:6px">
+                    ${l.fone ? `<button onclick="event.stopPropagation();abrirChat('${l.fone}','${l.nome.replace(/'/g,"\\'")}') " title="Chat WhatsApp" style="background:none;border:none;cursor:pointer;font-size:15px;padding:0;line-height:1">💬</button>` : ''}
+                    <span class="crm-card-data">${l.criadoEm ? new Date(l.criadoEm).toLocaleDateString('pt-BR') : '—'}</span>
+                  </div>
+                </div>
+              </div>`).join('')}
+          </div>
+          <button class="crm-add-card" onclick="abrirModalCRM('${col.key}', null)">＋ Adicionar</button>
+        </div>`;
+    }).join('');
+  }
+
+  function abrirModalCRM(etapa, id) {
+    const lead = id ? crmLeads.find(l => String(l.id) === String(id)) : null;
+    document.getElementById('crm-modal-title').textContent = lead ? '✏️ Editar Lead' : '➕ Novo Lead';
+    document.getElementById('crm-edit-id').value    = lead ? lead.id : '';
+    document.getElementById('crm-nome').value        = lead ? (lead.nome    || '') : '';
+    document.getElementById('crm-empresa').value     = lead ? (lead.empresa || '') : '';
+    document.getElementById('crm-fone').value        = lead ? (lead.fone    || '') : '';
+    document.getElementById('crm-valor').value       = lead ? (lead.valor   || '') : '';
+    document.getElementById('crm-fonte').value       = lead ? (lead.fonte   || '') : '';
+    document.getElementById('crm-obs').value         = lead ? (lead.obs     || '') : '';
+    // Popula select de etapa com as colunas atuais
+    const sel = document.getElementById('crm-etapa');
+    const etapaAtual = lead ? (lead.etapa || etapa) : etapa;
+    sel.innerHTML = CRM_COLUNAS.map(c => `<option value="${c.key}" ${c.key === etapaAtual ? 'selected' : ''}>${c.label}</option>`).join('');
+    document.getElementById('crm-btn-excluir').style.display = lead ? '' : 'none';
+    document.getElementById('modal-crm').classList.remove('hidden');
+  }
+
+  function fecharModalCRM() {
+    document.getElementById('modal-crm').classList.add('hidden');
+  }
+
+  async function salvarLead() {
+    const id     = document.getElementById('crm-edit-id').value;
+    const payload = {
+      nome:    document.getElementById('crm-nome').value.trim(),
+      empresa: document.getElementById('crm-empresa').value.trim(),
+      fone:    document.getElementById('crm-fone').value.trim(),
+      valor:   document.getElementById('crm-valor').value.trim(),
+      fonte:   document.getElementById('crm-fonte').value.trim(),
+      obs:     document.getElementById('crm-obs').value.trim(),
+      etapa:   document.getElementById('crm-etapa').value,
+    };
+    if (!payload.nome) { alert('Informe o nome do lead.'); return; }
+    if (id) {
+      await fetch('/api/crm/' + id, { method: 'PATCH', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    } else {
+      await fetch('/api/crm', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    }
+    fecharModalCRM();
+    carregarCRM();
+  }
+
+  async function excluirLead() {
+    const id = document.getElementById('crm-edit-id').value;
+    if (!id || !confirm('Excluir este lead?')) return;
+    await fetch('/api/crm/' + id, { method: 'DELETE' });
+    fecharModalCRM();
+    carregarCRM();
+  }
+
+  function trocarPeriodo(dias) {
+    periodoAtual = dias;
+    document.querySelectorAll('#tabs-campanhas .tab').forEach((t, i) => t.classList.toggle('active', [1,7,15][i] === dias));
+    atualizar(dias);
+  }
+
+  function trocarPeriodoFunil(dias) {
+    periodoFunilAtual = dias;
+    document.querySelectorAll('#tabs-funil .tab').forEach((t, i) => t.classList.toggle('active', [1,7,15][i] === dias));
+    atualizar(dias);
+  }
+
+  function atualizarRelogio() {
+    const restante = Math.max(0, proximaAtualizacao - Date.now());
+    const seg = Math.ceil(restante / 1000);
+    document.getElementById('next-update').textContent =
+      `Próxima atualização em ${Math.floor(seg/60)}:${String(seg%60).padStart(2,'0')}`;
+    const p = ((INTERVALO - restante) / INTERVALO) * 100;
+    document.getElementById('progress-bar').style.cssText = `width:${p}%;transition:none`;
+  }
+
+  // ── Contratos ──────────────────────────────────────────
+
+  function fmtData(iso) {
+    if (!iso) return '—';
+    const [y,m,d] = iso.split('-');
+    return `${d}/${m}/${y}`;
+  }
+
+  function atualizarPreview() {
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
+    set('pv-empresa',      document.getElementById('ct-empresa')?.value);
+    set('pv-cnpj',         document.getElementById('ct-cnpj')?.value);
+    set('pv-endereco',     document.getElementById('ct-endereco')?.value);
+    set('pv-representante',document.getElementById('ct-representante')?.value);
+    set('pv-cpf',          document.getElementById('ct-cpf')?.value);
+    set('pv-inicio',       fmtData(document.getElementById('ct-inicio')?.value));
+    set('pv-duracao',      DURACAO_LABELS[duracaoAtual] || `${duracaoAtual} meses`);
+    set('pv-cidade-contratante', document.getElementById('ct-cidade-contratante')?.value || 'cidade do contratante');
+    const val = document.getElementById('ct-valor')?.value;
+    const desc = parseFloat((document.getElementById('ct-desconto')?.value || '0').replace(',','.')) || 0;
+    const valNum = parseFloat((val || '0').replace('.','').replace(',','.')) || 0;
+    const final = valNum - desc;
+    const finalStr = final.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+    const elFinal = document.getElementById('ct-valor-final');
+    if (elFinal) elFinal.textContent = 'R$ ' + finalStr;
+    set('pv-valor', val ? (desc > 0 ? `R$ ${val} − R$ ${desc.toFixed(2).replace('.',',')} = R$ ${finalStr}` : 'R$ ' + val) : '—');
+    const temPermuta = document.getElementById('ct-tem-permuta')?.checked;
+    const perm = temPermuta ? document.getElementById('ct-permuta')?.value : null;
+    set('pv-permuta', perm ? 'R$ ' + perm : '—');
+    const pvPerm = document.getElementById('pv-permuta-wrap');
+    if (pvPerm) pvPerm.style.display = temPermuta ? '' : 'none';
+    const servicos = document.getElementById('ct-servicos')?.value || '';
+    const pvServ = document.getElementById('pv-servicos-preview');
+    if (pvServ) pvServ.innerHTML = servicos.split('\n').filter(l=>l.trim()).map(l=>`<div style="margin-bottom:4px">${l.trim()}</div>`).join('') || 'Serviços conforme plano selecionado.';
+    const empresa = document.getElementById('ct-empresa')?.value || 'CONTRATANTE';
+    set('pv-ass-contratante', empresa);
+    const cidade = document.getElementById('ct-cidade')?.value || 'Campo Grande - MS';
+    const dataAss = fmtData(document.getElementById('ct-data-assinatura')?.value);
+    set('pv-cidade-data', `${cidade}, ${dataAss}`);
+  }
+
+  let duracaoAtual = 6;
+  const DURACAO_LABELS = { 3: '3 (três) meses', 6: '6 (seis) meses', 8: '8 (oito) meses', 12: '12 (doze) meses' };
+
+  function selecionarDuracao(meses) {
+    duracaoAtual = meses;
+    document.querySelectorAll('#duracao-btns .plano-btn').forEach((b, i) => b.classList.toggle('active', [3,6,8,12][i] === meses));
+    atualizarPreview();
+  }
+
+  const PLANOS = {
+    1: {
+      servicos: `• A criação e o gerenciamento de campanhas de marketing mensal através das redes sociais Meta Ads e Google Ads, com geração ativa de contatos interessados nos serviços da contratante.\n• Captação e edição de criativos sob demanda das campanhas de gestão de tráfego.`,
+      valor: '1.850,00',
+    },
+    2: {
+      servicos: `• A criação e o gerenciamento de campanhas de marketing mensal através das redes sociais Meta Ads e Google Ads, com geração ativa de contatos interessados nos serviços da contratante.\n• Captação e edição de criativos sob demanda das campanhas de gestão de tráfego.\n• Instalação e treinamento de um CRM comercial para gerenciamento dos contatos (sistema pago à parte pelo CONTRATANTE).`,
+      valor: '2.200,00',
+    },
+    3: {
+      servicos: `• A criação e o gerenciamento de campanhas de marketing mensal através das redes sociais Meta Ads e Google Ads, com geração ativa de contatos interessados nos serviços da contratante.\n• Captação e edição de criativos sob demanda das campanhas de gestão de tráfego.\n• Instalação e treinamento de um CRM comercial para gerenciamento dos contatos (sistema pago à parte pelo CONTRATANTE).\n• Gerenciamento das redes sociais contendo 2 postagens por semana no feed da plataforma, sendo 1 vídeo e 1 publicação estática.`,
+      valor: '3.500,00',
+    },
+    4: {
+      servicos: `• Gerenciamento das redes sociais contendo 2 postagens por semana no feed da plataforma, sendo 1 vídeo e 1 publicação estática.\n• Captação e edição de criativos sob demanda para as publicações.`,
+      valor: '1.500,00',
+    },
+  };
+
+  function selecionarPlano(num) {
+    document.querySelectorAll('.plano-btn').forEach((b, i) => b.classList.toggle('active', [1,2,3,4,0][i] === num));
+    if (num === 0) return; // personalizado — não sobrescreve
+    const plano = PLANOS[num];
+    document.getElementById('ct-servicos').value = plano.servicos;
+    document.getElementById('ct-valor').value = plano.valor;
+    atualizarPreview();
+  }
+
+  function togglePermuta(ativo) {
+    document.getElementById('grupo-permuta').style.display = ativo ? 'block' : 'none';
+    if (!ativo) document.getElementById('ct-permuta').value = '';
+    atualizarPreview();
+  }
+
+  // Live preview ao digitar
+  document.querySelectorAll('[id^="ct-"]').forEach(el => {
+    el.addEventListener('input', atualizarPreview);
+    el.addEventListener('change', atualizarPreview);
+  });
+
+  // Preenche data de início e assinatura com hoje
+  (function() {
+    const hoje = new Date().toISOString().split('T')[0];
+    document.getElementById('ct-inicio').value = hoje;
+    document.getElementById('ct-data-assinatura').value = hoje;
+    atualizarPreview();
+  })();
+
+  async function gerarContrato(tipo) {
+    const empresa = document.getElementById('ct-empresa').value.trim();
+    const representante = document.getElementById('ct-representante').value.trim();
+    const inicio = document.getElementById('ct-inicio').value;
+    const valor = document.getElementById('ct-valor').value.trim();
+    const dataAss = document.getElementById('ct-data-assinatura').value;
+
+    if (!empresa || !representante || !inicio || !valor || !dataAss) {
+      const s = document.getElementById('ct-status');
+      s.textContent = '⚠ Preencha os campos obrigatórios (*)';
+      s.className = 'contrato-status err';
+      return;
+    }
+
+    const s = document.getElementById('ct-status');
+    s.textContent = 'Gerando arquivo...';
+    s.className = 'contrato-status';
+
+    const payload = {
+      servicos:          document.getElementById('ct-servicos').value.trim(),
+      plano:             document.querySelector('#plano-btns .plano-btn.active')?.textContent?.trim() || '—',
+      duracao:           duracaoAtual,
+      empresaNome:       empresa,
+      cidadeContratante: document.getElementById('ct-cidade-contratante').value.trim(),
+      empresaCnpj:       document.getElementById('ct-cnpj').value.trim(),
+      empresaEndereco:   document.getElementById('ct-endereco').value.trim(),
+      representanteNome: representante,
+      representanteCpf:  document.getElementById('ct-cpf').value.trim(),
+      dataInicio:        inicio,
+      valorMensal:       valor,
+      desconto:          document.getElementById('ct-desconto').value.trim() || null,
+      valorPermuta:      document.getElementById('ct-tem-permuta').checked ? (document.getElementById('ct-permuta').value.trim() || '0') : null,
+      dataAssinatura:    dataAss,
+      cidadeAssinatura:  document.getElementById('ct-cidade').value.trim() || 'Campo Grande - MS',
+    };
+
+    try {
+      const res = await fetch(`/api/contrato/${tipo}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Erro desconhecido');
+      }
+
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      const nome = empresa.replace(/[^a-z0-9]/gi, '_');
+      a.href     = url;
+      a.download = `contrato_${nome}.${tipo}`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      s.textContent = `✓ ${tipo.toUpperCase()} gerado com sucesso!`;
+      s.className = 'contrato-status ok';
+      carregarContratos();
+    } catch (e) {
+      s.textContent = '✗ Erro: ' + e.message;
+      s.className = 'contrato-status err';
+    }
+  }
+
+  // ── Gestão de Contratos ──────────────────────────────
+
+  let todosContratos = [];
+  let filtroAtual = 'todos';
+
+  function fmtDataBR(iso) {
+    if (!iso) return '—';
+    const [y,m,d] = iso.split('-');
+    return `${d}/${m}/${y}`;
+  }
+
+  function duracaoLabel(meses) {
+    const m = { 3:'3 meses', 6:'6 meses', 8:'8 meses', 12:'12 meses' };
+    return m[meses] || `${meses} meses`;
+  }
+
+  function renderContratoCard(c) {
+    const totalDias = c.duracaoMeses * 30;
+    const pct = c.status === 'vencido' ? 100 : Math.max(0, Math.min(100, ((totalDias - c.diasRestantes) / totalDias) * 100));
+    const diasLabel = c.status === 'vencido'
+      ? `Venceu há ${Math.abs(c.diasRestantes)} dias`
+      : c.status === 'a_vencer'
+      ? `⚠ Vence em ${c.diasRestantes} dias`
+      : `${c.diasRestantes} dias restantes`;
+
+    return `
+      <div class="contrato-card ${c.status}" id="cc-${c.id}">
+        <div>
+          <div class="cc-nome">${c.empresaNome}</div>
+          <div class="cc-meta">
+            <span>👤 ${c.representante}</span>
+            <span>📅 ${fmtDataBR(c.dataInicio)} → ${fmtDataBR(c.dataFim)}</span>
+            <span>⏱ ${duracaoLabel(c.duracaoMeses)}</span>
+            <span>💰 R$ ${c.valorMensal}/mês</span>
+            ${c.plano && c.plano !== '—' ? `<span>📦 ${c.plano}</span>` : ''}
+          </div>
+          <div class="cc-badges">
+            <span class="cc-badge ${c.status}">${c.status === 'ativo' ? 'Ativo' : c.status === 'a_vencer' ? 'A vencer' : 'Vencido'}</span>
+            <span style="font-size:12px;color:${c.status==='vencido'?'#dc2626':c.status==='a_vencer'?'#a16207':'#888'};font-weight:600">${diasLabel}</span>
+          </div>
+          <div class="cc-barra-wrap"><div class="cc-barra ${c.status}" style="width:${pct}%"></div></div>
+        </div>
+        <div class="cc-acoes">
+          <button class="cc-btn cc-btn-renovar" onclick="renovarContrato('${c.id}')">🔄 Renovar</button>
+          <button class="cc-btn" style="border-color:#e8eaed;color:#666" onclick="abrirModalEditar(${c.id})">✏️ Editar</button>
+          <button class="cc-btn cc-btn-excluir" onclick="excluirContrato('${c.id}')">✕</button>
+        </div>
+      </div>`;
+  }
+
+  function renderGestao(contratos) {
+    todosContratos = contratos;
+    document.getElementById('gs-ativos').textContent   = contratos.filter(c => c.status === 'ativo').length;
+    document.getElementById('gs-avencer').textContent  = contratos.filter(c => c.status === 'a_vencer').length;
+    document.getElementById('gs-vencidos').textContent = contratos.filter(c => c.status === 'vencido').length;
+    filtrarContratos(filtroAtual);
+  }
+
+  function filtrarContratos(filtro) {
+    filtroAtual = filtro;
+    document.querySelectorAll('.filtro-btn').forEach((b,i) => b.classList.toggle('active', ['todos','ativo','a_vencer','vencido'][i] === filtro));
+    const lista = filtro === 'todos' ? todosContratos : todosContratos.filter(c => c.status === filtro);
+    const el = document.getElementById('contratos-lista');
+    if (lista.length === 0) {
+      el.innerHTML = `<div class="gestao-vazia"><div>📄</div>${filtro === 'todos' ? 'Nenhum contrato cadastrado ainda.<br>Gere um contrato pelo formulário acima.' : 'Nenhum contrato nesta categoria.'}</div>`;
+    } else {
+      el.innerHTML = lista.map(renderContratoCard).join('');
+    }
+  }
+
+  async function carregarContratos() {
+    try {
+      const res = await fetch('/api/contratos');
+      const data = await res.json();
+      renderGestao(data);
+    } catch(e) { console.error('Erro ao carregar contratos', e); }
+  }
+
+  function abrirModalEditar(id) {
+    const c = todosContratos.find(c => c.id === id);
+    if (!c) return;
+    document.getElementById('edit-id').value       = id;
+    document.getElementById('edit-empresa').value  = c.empresaNome;
+    document.getElementById('edit-inicio').value   = c.dataInicio;
+    document.getElementById('edit-duracao').value  = c.duracaoMeses;
+    document.getElementById('edit-valor').value    = c.valorMensal;
+    document.getElementById('modal-editar').classList.remove('hidden');
+  }
+
+  function fecharModal() {
+    document.getElementById('modal-editar').classList.add('hidden');
+  }
+
+  async function salvarEdicao() {
+    const id       = document.getElementById('edit-id').value;
+    const inicio   = document.getElementById('edit-inicio').value;
+    const duracao  = document.getElementById('edit-duracao').value;
+    const valor    = document.getElementById('edit-valor').value.trim();
+    await fetch(`/api/contratos/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dataInicio: inicio, duracaoMeses: duracao, valorMensal: valor }),
+    });
+    fecharModal();
+    carregarContratos();
+  }
+
+  // Fecha modal clicando fora
+  document.getElementById('modal-editar').addEventListener('click', function(e) {
+    if (e.target === this) fecharModal();
+  });
+
+  async function renovarContrato(id) {
+    if (!confirm('Renovar este contrato a partir de hoje?')) return;
+    await fetch(`/api/contratos/${id}/renovar`, { method: 'PATCH' });
+    carregarContratos();
+  }
+
+  async function excluirContrato(id) {
+    if (!confirm('Remover este contrato da lista?')) return;
+    await fetch(`/api/contratos/${id}`, { method: 'DELETE' });
+    carregarContratos();
+  }
+
+
+  // ── Template ──────────────────────────────────────────
+
+  async function carregarTemplate() {
+    try {
+      const res = await fetch('/api/template');
+      if (res.ok) {
+        const { template } = await res.json();
+        if (template) document.getElementById('tpl-textarea').value = template;
+      }
+    } catch (_) {}
+  }
+
+  async function salvarTemplate() {
+    const template = document.getElementById('tpl-textarea').value.trim();
+    const msg = document.getElementById('tpl-msg');
+    try {
+      const res = await fetch('/api/template', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ template }),
+      });
+      if (res.ok) {
+        msg.textContent = '✓ Template salvo com sucesso!';
+        msg.style.color = '#22c55e';
+      } else {
+        throw new Error();
+      }
+    } catch (_) {
+      msg.textContent = '✗ Erro ao salvar.';
+      msg.style.color = '#f87171';
+    }
+    setTimeout(() => { msg.textContent = ''; }, 3000);
+  }
+
+  function resetarTemplate() {
+    if (!confirm('Restaurar o template padrão? Seu template personalizado será apagado.')) return;
+    fetch('/api/template', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ template: '' }),
+    });
+    document.getElementById('tpl-textarea').value = '';
+    const msg = document.getElementById('tpl-msg');
+    msg.textContent = '✓ Template padrão restaurado.';
+    msg.style.color = '#60a5fa';
+    setTimeout(() => { msg.textContent = ''; }, 3000);
+  }
+
+  function inserirCampo(campo) {
+    const ta = document.getElementById('tpl-textarea');
+    ta.focus();
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const before = ta.value.substring(0, start);
+    const after = ta.value.substring(end);
+    ta.value = before + campo + after;
+    const pos = start + campo.length;
+    ta.selectionStart = pos;
+    ta.selectionEnd = pos;
+    ta.focus();
+  }
+
+  carregarConfigFunil();
+  atualizar(1);
+  setInterval(() => atualizar(viewAtual === 'funil' ? periodoFunilAtual : periodoAtual), INTERVALO);
+  setInterval(atualizarRelogio, 1000);
+
+  // ── GOOGLE ADS ──────────────────────────────────────────
+
+  function trocarPeriodoGoogle(dias) {
+    googlePeriodoAtual = dias;
+    document.querySelectorAll('#view-google .tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('gtab-' + dias)?.classList.add('active');
+    const label = dias === 1 ? 'Hoje' : `Últimos ${dias} dias`;
+    document.getElementById('g-periodo-label').textContent = `Google Ads — ${label}`;
+    carregarGoogleAds(dias);
+  }
+
+  async function carregarGoogleAds(dias) {
+    document.getElementById('g-tabela').innerHTML = '<div class="loading">⏳ Conectando ao Google Ads...</div>';
+    document.getElementById('g-keywords').innerHTML = '<div class="loading">⏳ Carregando keywords...</div>';
+    document.getElementById('g-insights').innerHTML = '';
+    try {
+      const res = await fetch(`/api/google/campanhas?dias=${dias}`);
+      const data = await res.json();
+
+      if (data.erro) {
+        document.getElementById('g-tabela').innerHTML = `<div class="loading">Erro: ${data.erro}</div>`;
+        return;
+      }
+
+      const { campanhas, keywords } = data;
+
+      // ── Cards ────────────────────────────────────────────
+      const totalGasto = campanhas.reduce((s, c) => s + c.gasto, 0);
+      const totalConv  = campanhas.reduce((s, c) => s + c.conversoes, 0);
+      const totalCliques = campanhas.reduce((s, c) => s + c.cliques, 0);
+      const totalImp   = campanhas.reduce((s, c) => s + c.impressoes, 0);
+      const ctrMedio   = campanhas.length > 0 ? campanhas.reduce((s, c) => s + c.ctr, 0) / campanhas.length : 0;
+      const cpcMedio   = totalCliques > 0 ? totalGasto / totalCliques : 0;
+      const cpa        = totalConv > 0 ? totalGasto / totalConv : 0;
+
+      document.getElementById('g-total').textContent      = campanhas.length;
+      document.getElementById('g-gasto').textContent      = 'R$ ' + totalGasto.toFixed(2);
+      document.getElementById('g-conv').textContent       = totalConv.toFixed(0);
+      document.getElementById('g-cliques').textContent    = totalCliques.toLocaleString('pt-BR');
+      document.getElementById('g-impressoes').textContent = totalImp.toLocaleString('pt-BR');
+      document.getElementById('g-ctr').textContent        = ctrMedio.toFixed(2) + '%';
+      document.getElementById('g-cpc').textContent        = 'R$ ' + cpcMedio.toFixed(2);
+      document.getElementById('g-cpa').textContent        = totalConv > 0 ? 'R$ ' + cpa.toFixed(2) : '—';
+
+      // ── Tabela campanhas ─────────────────────────────────
+      if (campanhas.length === 0) {
+        document.getElementById('g-tabela').innerHTML = '<div class="empty">Nenhuma campanha ativa</div>';
+      } else {
+        const rows = campanhas.map(c => `
+          <tr>
+            <td><strong>${c.nome}</strong></td>
+            <td>R$ ${c.gasto.toFixed(2)}</td>
+            <td>${c.cliques.toLocaleString('pt-BR')}</td>
+            <td>${c.impressoes.toLocaleString('pt-BR')}</td>
+            <td>${c.ctr.toFixed(2)}%</td>
+            <td>R$ ${c.cpc.toFixed(2)}</td>
+            <td>${c.conversoes.toFixed(0)}</td>
+            <td>${c.conversoes > 0 ? 'R$ ' + (c.gasto/c.conversoes).toFixed(2) : '—'}</td>
+          </tr>`).join('');
+        document.getElementById('g-tabela').innerHTML = `
+          <table>
+            <thead><tr>
+              <th>Campanha</th><th>Gasto</th><th>Cliques</th>
+              <th>Impressões</th><th>CTR</th><th>CPC</th>
+              <th>Conversões</th><th>Custo/Conv.</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+          </table>`;
+      }
+
+      // ── Tabela keywords ──────────────────────────────────
+      const kwComDados = keywords.filter(k => k.impressoes > 0).sort((a,b) => b.cliques - a.cliques);
+      if (kwComDados.length === 0) {
+        document.getElementById('g-keywords').innerHTML = '<div class="empty">Nenhuma palavra-chave com dados no período</div>';
+      } else {
+        const kwRows = kwComDados.map(k => {
+          const ctrColor = k.ctr >= 10 ? 'green' : k.ctr >= 5 ? 'yellow' : 'red';
+          return `<tr>
+            <td><strong>${k.texto}</strong></td>
+            <td><span class="badge badge-sem">${k.tipo}</span></td>
+            <td>${k.impressoes.toLocaleString('pt-BR')}</td>
+            <td>${k.cliques}</td>
+            <td class="${ctrColor}">${k.ctr.toFixed(2)}%</td>
+            <td>R$ ${k.cpc.toFixed(2)}</td>
+            <td>R$ ${k.gasto.toFixed(2)}</td>
+            <td>${k.conversoes > 0 ? k.conversoes.toFixed(0) : '—'}</td>
+          </tr>`;
+        }).join('');
+        document.getElementById('g-keywords').innerHTML = `
+          <table>
+            <thead><tr>
+              <th>Palavra-chave</th><th>Tipo</th><th>Impressões</th><th>Cliques</th>
+              <th>CTR</th><th>CPC</th><th>Gasto</th><th>Conv.</th>
+            </tr></thead>
+            <tbody>${kwRows}</tbody>
+          </table>`;
+      }
+
+      // ── Insights / Observações ───────────────────────────
+      const insights = [];
+
+      if (totalConv === 0) {
+        insights.push({ tipo: 'alerta', icon: '⚠️', titulo: 'Sem conversões registradas', texto: 'Nenhuma conversão no período. A tag de rastreamento foi instalada — aguarde as primeiras interações para o algoritmo começar a aprender.' });
+      }
+
+      if (totalGasto > 0 && totalConv === 0) {
+        insights.push({ tipo: 'alerta', icon: '🎯', titulo: 'Estratégia atual: Maximizar Cliques', texto: 'Ideal mudar para "Maximizar Conversões" após acumular 15–20 conversões. Por enquanto, o Google está otimizando apenas para cliques, sem saber quem converte.' });
+      }
+
+      const kwSemImpressao = keywords.filter(k => k.impressoes === 0);
+      if (kwSemImpressao.length > 0) {
+        insights.push({ tipo: 'info', icon: '📊', titulo: `${kwSemImpressao.length} palavras sem impressões`, texto: `As palavras adicionadas recentemente ainda estão sem impressões. Isso é normal nos primeiros dias — o Google leva de 24h a 72h para entrar em todos os leilões.` });
+      }
+
+      const topKw = kwComDados.filter(k => k.ctr >= 10);
+      if (topKw.length > 0) {
+        insights.push({ tipo: 'positivo', icon: '⭐', titulo: 'Palavras com alto CTR', texto: topKw.map(k => `<strong>${k.texto}</strong> (${k.ctr.toFixed(1)}% CTR)`).join(', ') + '. Considere aumentar o lance nessas palavras para garantir posição de destaque.' });
+      }
+
+      const kwAltoCpc = kwComDados.filter(k => k.cpc > 8 && k.cliques > 0);
+      if (kwAltoCpc.length > 0) {
+        insights.push({ tipo: 'alerta', icon: '💸', titulo: 'Palavras com CPC elevado', texto: kwAltoCpc.map(k => `<strong>${k.texto}</strong> (R$ ${k.cpc.toFixed(2)}/clique)`).join(', ') + '. Avalie se o retorno justifica o custo ou ajuste os lances.' });
+      }
+
+      if (totalCliques > 0 && totalConv === 0) {
+        insights.push({ tipo: 'info', icon: '🔍', titulo: 'Cliques sem conversão', texto: `${totalCliques} cliques registrados mas nenhum virou contato. Verifique se o botão de WhatsApp está visível e chamativo na página de destino.` });
+      }
+
+      insights.push({ tipo: 'info', icon: '📅', titulo: 'Campanha recente', texto: 'Campanha iniciada em 25/03 — ainda em fase de aprendizado. O Google precisa de 2–4 semanas e pelo menos 30 conversões para otimizar de forma eficiente.' });
+
+      const insightHtml = insights.map(i => {
+        const cores = { alerta: '#fef3c7', positivo: '#dcfce7', info: '#ede9fe' };
+        const bordas = { alerta: '#f59e0b', positivo: '#16a34a', info: '#6366f1' };
+        return `<div style="background:${cores[i.tipo]};border-left:4px solid ${bordas[i.tipo]};border-radius:10px;padding:14px 16px;">
+          <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:4px">${i.icon} ${i.titulo}</div>
+          <div style="font-size:12px;color:#475569;line-height:1.5">${i.texto}</div>
+        </div>`;
+      }).join('');
+
+      document.getElementById('g-insights').innerHTML = insightHtml;
+
+    } catch (e) {
+      document.getElementById('g-tabela').innerHTML = `<div class="loading">Erro ao carregar: ${e.message}</div>`;
+    }
+  }
+
+  // ── Agenda ────────────────────────────────────────────────────────────────
+  const TIPO_ICONE = { ligacao: '📞', retorno: '🔄', reuniao: '🤝' };
+  const TIPO_LABEL = { ligacao: 'Ligação', retorno: 'Retorno', reuniao: 'Reunião' };
+
+  async function carregarAgenda() {
+    try {
+      const res = await fetch('/api/agenda');
+      const items = await res.json();
+      renderAgenda(items);
+    } catch (_) {
+      document.getElementById('agenda-lista').innerHTML = '<div class="agenda-empty">Erro ao carregar.</div>';
+    }
+  }
+
+  function renderAgenda(items) {
+    const lista = document.getElementById('agenda-lista');
+    if (!items.length) { lista.innerHTML = '<div class="agenda-empty">Nenhum agendamento ainda.<br>Use o botão ＋ ou o 📅 no chat de um lead.</div>'; return; }
+
+    const hoje = new Date().toISOString().split('T')[0];
+    // Ordena por data+hora
+    items.sort((a,b) => (a.data+a.hora).localeCompare(b.data+b.hora));
+
+    // Agrupa por data
+    const grupos = {};
+    items.forEach(i => { if (!grupos[i.data]) grupos[i.data] = []; grupos[i.data].push(i); });
+
+    lista.innerHTML = Object.entries(grupos).map(([data, its]) => {
+      const d = new Date(data + 'T12:00:00');
+      const eHoje = data === hoje;
+      const label = eHoje ? 'Hoje' : d.toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long' });
+      const itensHtml = its.map(i => {
+        const icone = TIPO_ICONE[i.tipo] || '📅';
+        const statusLabel = i.status === 'feito' ? '✓ Feito' : i.status === 'cancelado' ? '✕ Cancelado' : '● Pendente';
+        return `
+        <div class="agenda-item ${i.status}" id="ag-${i.id}">
+          <div class="agenda-item-icon ${i.tipo}">${icone}</div>
+          <div class="agenda-item-body">
+            <div class="agenda-item-title">${escHtml(i.leadNome || '—')} ${i.leadFone ? `<span style="font-weight:400;color:#94a3b8;font-size:12px">${i.leadFone}</span>` : ''}</div>
+            <div class="agenda-item-sub">${TIPO_LABEL[i.tipo] || i.tipo} · ${i.hora || '—'}</div>
+            ${i.obs ? `<div class="agenda-item-obs">${escHtml(i.obs)}</div>` : ''}
+          </div>
+          <div class="agenda-item-actions">
+            <span class="agenda-hora">${i.hora || ''}</span>
+            <button class="agenda-status-btn ${i.status}" onclick="ciclarStatusAgenda('${i.id}','${i.status}')">${statusLabel}</button>
+            <button class="agenda-del-btn" onclick="excluirAgenda('${i.id}')">🗑</button>
+          </div>
+        </div>`;
+      }).join('');
+      return `<div class="agenda-day"><div class="agenda-day-label ${eHoje ? 'hoje' : ''}"><span>${label}</span></div><div class="agenda-items">${itensHtml}</div></div>`;
+    }).join('');
+  }
+
+  async function ciclarStatusAgenda(id, statusAtual) {
+    const proximo = statusAtual === 'pendente' ? 'feito' : statusAtual === 'feito' ? 'cancelado' : 'pendente';
+    await fetch(`/api/agenda/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ status: proximo }) });
+    carregarAgenda();
+  }
+
+  async function excluirAgenda(id) {
+    if (!confirm('Excluir agendamento?')) return;
+    await fetch(`/api/agenda/${id}`, { method:'DELETE' });
+    carregarAgenda();
+  }
+
+  function abrirNovoAgendamento() {
+    const nome = prompt('Nome do contato:');
+    if (nome === null) return;
+    const fone = prompt('WhatsApp (só números):') || '';
+    const tipo = prompt('Tipo (ligacao / retorno / reuniao):', 'ligacao') || 'ligacao';
+    const data = prompt('Data (AAAA-MM-DD):', new Date().toISOString().split('T')[0]);
+    if (!data) return;
+    const hora = prompt('Hora (HH:MM):', '09:00') || '09:00';
+    const obs  = prompt('Observação (opcional):') || '';
+    salvarAgendamento({ leadNome: nome, leadFone: fone, tipo, data, hora, obs });
+  }
+
+  async function salvarAgendamento(dados) {
+    await fetch('/api/agenda', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(dados) });
+    if (viewAtual === 'agenda') carregarAgenda();
+  }
+
+  // ── Agendar inline no chat ─────────────────────────────────────────────────
+  function toggleAgendarForm() {
+    const form = document.getElementById('chat-agendar-form');
+    const show = form.style.display === 'none';
+    form.style.display = show ? 'flex' : 'none';
+    if (show) {
+      // Data padrão = amanhã
+      const amanha = new Date(); amanha.setDate(amanha.getDate()+1);
+      document.getElementById('ag-data').value = amanha.toISOString().split('T')[0];
+    }
+  }
+
+  async function salvarAgendamentoDoChat() {
+    const tipo = document.getElementById('ag-tipo').value;
+    const data = document.getElementById('ag-data').value;
+    const hora = document.getElementById('ag-hora').value;
+    const obs  = document.getElementById('ag-obs').value;
+    if (!data) { alert('Informe a data'); return; }
+    const nome = document.getElementById('chat-nome').textContent;
+    const fone = chatFoneAtual;
+    await salvarAgendamento({ leadNome: nome, leadFone: fone, tipo, data, hora, obs });
+    toggleAgendarForm();
+    document.getElementById('ag-obs').value = '';
+    // Feedback visual
+    const btn = document.querySelector('.chat-agendar-save');
+    if (btn) { btn.textContent = '✓ Agendado!'; setTimeout(() => btn.textContent = '✓ Agendar', 2000); }
+  }
+
+  // ── Chat WhatsApp ──────────────────────────────────────────────────────────
+  let chatFoneAtual = null;
+  let chatPollTimer = null;
+
+  async function abrirChat(fone, nome) {
+    chatFoneAtual = fone;
+    document.getElementById('chat-nome').textContent = nome || fone;
+    document.getElementById('chat-fone-display').textContent = fone;
+    document.getElementById('modal-chat').classList.remove('hidden');
+    document.getElementById('chat-input').value = '';
+    await carregarMensagens();
+    clearInterval(chatPollTimer);
+    chatPollTimer = setInterval(carregarMensagens, 3000);
+  }
+
+  function fecharChat() {
+    clearInterval(chatPollTimer);
+    chatPollTimer = null;
+    chatFoneAtual = null;
+    document.getElementById('modal-chat').classList.add('hidden');
+  }
+
+  async function carregarMensagens() {
+    if (!chatFoneAtual) return;
+    try {
+      const res = await fetch(`/api/chat/${chatFoneAtual}`);
+      const msgs = await res.json();
+      const box = document.getElementById('chat-messages');
+      const atBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 60;
+
+      if (msgs.length === 0) {
+        box.innerHTML = '<div class="chat-empty">Nenhuma mensagem ainda.<br>As mensagens recebidas aparecerão aqui.</div>';
+        return;
+      }
+
+      box.innerHTML = msgs.map(m => {
+        const lado = m.de === 'eu' ? 'meu' : 'deles';
+        const hora = new Date(m.ts).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        return `<div class="chat-msg ${lado}">${escHtml(m.texto)}<div class="chat-msg-time">${hora}</div></div>`;
+      }).join('');
+
+      if (atBottom) box.scrollTop = box.scrollHeight;
+    } catch (_) {}
+  }
+
+  async function enviarChatMsg() {
+    const input = document.getElementById('chat-input');
+    const btn = document.getElementById('chat-send-btn');
+    const texto = input.value.trim();
+    if (!texto || !chatFoneAtual) return;
+    input.value = '';
+    btn.disabled = true;
+    try {
+      await fetch(`/api/chat/${chatFoneAtual}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ texto }),
+      });
+      await carregarMensagens();
+    } catch (_) {}
+    btn.disabled = false;
+    input.focus();
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  }
+
+  // Fecha chat ao clicar fora
+  document.getElementById('modal-chat').addEventListener('click', function(e) {
+    if (e.target === this) fecharChat();
+  });
+</script>
+
+<!-- Modal Config CRM Colunas -->
+<div class="modal-overlay hidden" id="modal-config-crm">
+  <div class="modal-box" style="width:460px;max-width:95vw">
+    <h4>⚙️ Configurar Colunas</h4>
+    <p style="font-size:12px;color:#94a3b8;margin-bottom:16px">Renomeie e reordene as colunas do seu pipeline.</p>
+    <div id="config-crm-lista"></div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="fecharConfigCRM()">Cancelar</button>
+      <button class="modal-btn modal-btn-ok" onclick="salvarConfigCRM()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Config Funil Etapas -->
+<div class="modal-overlay hidden" id="modal-config-funil">
+  <div class="modal-box" style="width:420px;max-width:95vw">
+    <h4>✏️ Editar Etapas do Funil</h4>
+    <p style="font-size:12px;color:#94a3b8;margin-bottom:16px">Personalize os nomes de cada etapa para o seu negócio.</p>
+    <div id="config-funil-lista"></div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="fecharConfigFunil()">Cancelar</button>
+      <button class="modal-btn modal-btn-ok" onclick="salvarConfigFunil()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal CRM -->
+<div class="modal-overlay hidden" id="modal-crm">
+  <div class="modal-box" style="width:480px;max-width:95vw">
+    <h4 id="crm-modal-title">➕ Novo Lead</h4>
+    <input type="hidden" id="crm-edit-id"/>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="form-group" style="grid-column:1/-1">
+        <label>Nome *</label>
+        <input type="text" id="crm-nome" placeholder="Ex: João Silva"/>
+      </div>
+      <div class="form-group">
+        <label>Empresa</label>
+        <input type="text" id="crm-empresa" placeholder="Ex: Clínica X"/>
+      </div>
+      <div class="form-group">
+        <label>WhatsApp</label>
+        <input type="text" id="crm-fone" placeholder="(67) 9 9999-9999"/>
+      </div>
+      <div class="form-group">
+        <label>Valor estimado (R$)</label>
+        <input type="text" id="crm-valor" placeholder="1.850,00"/>
+      </div>
+      <div class="form-group">
+        <label>Fonte</label>
+        <input type="text" id="crm-fonte" placeholder="Ex: Meta Ads, Indicação"/>
+      </div>
+      <div class="form-group" style="grid-column:1/-1">
+        <label>Etapa</label>
+        <select id="crm-etapa">
+          <option value="novo">Novo Lead</option>
+          <option value="contato">Contato Feito</option>
+          <option value="reuniao">Reunião Agendada</option>
+          <option value="proposta">Proposta Enviada</option>
+          <option value="fechado">Fechado ✅</option>
+          <option value="perdido">Perdido ❌</option>
+        </select>
+      </div>
+      <div class="form-group" style="grid-column:1/-1">
+        <label>Observação</label>
+        <textarea id="crm-obs" rows="2" placeholder="Anotações sobre o lead..."></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="fecharModalCRM()">Cancelar</button>
+      <button class="modal-btn" id="crm-btn-excluir" style="background:#fee2e2;color:#dc2626;display:none" onclick="excluirLead()">🗑 Excluir</button>
+      <button class="modal-btn modal-btn-ok" onclick="salvarLead()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Chat WhatsApp -->
+<div class="modal-overlay hidden" id="modal-chat">
+  <div class="modal-box chat-modal">
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <div class="chat-header-name" id="chat-nome">—</div>
+        <div class="chat-header-fone" id="chat-fone-display">—</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button onclick="toggleAgendarForm()" title="Agendar" style="background:#ede9fe;border:none;border-radius:8px;padding:6px 10px;font-size:14px;cursor:pointer;">📅</button>
+        <button class="chat-close" onclick="fecharChat()">✕</button>
+      </div>
+    </div>
+    <!-- Formulário de agendamento inline -->
+    <div class="chat-agendar-form" id="chat-agendar-form" style="display:none">
+      <div class="chat-agendar-row">
+        <select id="ag-tipo">
+          <option value="ligacao">📞 Ligação</option>
+          <option value="retorno">🔄 Retorno</option>
+          <option value="reuniao">🤝 Reunião</option>
+        </select>
+        <input type="date" id="ag-data"/>
+        <input type="time" id="ag-hora" value="09:00"/>
+      </div>
+      <input type="text" id="ag-obs" placeholder="Observação (opcional)"/>
+      <div class="chat-agendar-actions">
+        <button class="chat-agendar-cancel" onclick="toggleAgendarForm()">Cancelar</button>
+        <button class="chat-agendar-save" onclick="salvarAgendamentoDoChat()">✓ Agendar</button>
+      </div>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+      <div class="chat-empty">Nenhuma mensagem ainda</div>
+    </div>
+    <div class="chat-input-row">
+      <input class="chat-input" id="chat-input" type="text" placeholder="Digite uma mensagem..." onkeydown="if(event.key==='Enter')enviarChatMsg()"/>
+      <button class="chat-send" id="chat-send-btn" onclick="enviarChatMsg()">Enviar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal edição de contrato -->
+<div class="modal-overlay hidden" id="modal-editar">
+  <div class="modal-box">
+    <h4>✏️ Editar Contrato</h4>
+    <input type="hidden" id="edit-id"/>
+    <div class="form-group">
+      <label>Cliente</label>
+      <input type="text" id="edit-empresa" readonly style="background:#f3f4f6;color:#888;cursor:default"/>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="form-group">
+        <label>Data de início</label>
+        <input type="date" id="edit-inicio"/>
+      </div>
+      <div class="form-group">
+        <label>Duração</label>
+        <select id="edit-duracao">
+          <option value="3">3 meses</option>
+          <option value="6">6 meses</option>
+          <option value="8">8 meses</option>
+          <option value="12">12 meses</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Valor mensal (R$)</label>
+      <input type="text" id="edit-valor" placeholder="1.850,00"/>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" onclick="fecharModal()">Cancelar</button>
+      <button class="modal-btn modal-btn-ok" onclick="salvarEdicao()">Salvar</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

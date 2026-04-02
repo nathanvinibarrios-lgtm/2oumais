@@ -1,0 +1,17 @@
+{
+  "1": {
+    "reunioes": 4,
+    "vendas": 2,
+    "receita": 1500
+  },
+  "7": {
+    "reunioes": 0,
+    "vendas": 0,
+    "receita": 0
+  },
+  "15": {
+    "reunioes": 5,
+    "vendas": 5,
+    "receita": 60000
+  }
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "key": "novo",
+    "label": "Novo Lead"
+  },
+  {
+    "key": "contato",
+    "label": "em atendimento"
+  },
+  {
+    "key": "reuniao",
+    "label": "Reunião Agendada"
+  },
+  {
+    "key": "proposta",
+    "label": "Proposta Enviada"
+  },
+  {
+    "key": "fechado",
+    "label": "Fechado"
+  }
+]

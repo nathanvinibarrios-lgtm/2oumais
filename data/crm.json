@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1775101172068,
+    "nome": "Nathan  Barrios",
+    "empresa": "",
+    "fone": "556793076963",
+    "email": "",
+    "valor": "",
+    "fonte": "WhatsApp",
+    "etapa": "novo",
+    "obs": "Primeira mensagem: \"Marco\t+5582981081001\"",
+    "criadoEm": "2026-04-02T03:39:32.068Z"
+  },
+  {
+    "id": 1774502757103,
+    "nome": "Teste Lead",
+    "empresa": "Empresa X",
+    "fone": "",
+    "email": "",
+    "valor": "1.850,00",
+    "fonte": "Meta Ads",
+    "etapa": "novo",
+    "obs": "",
+    "criadoEm": "2026-03-26T05:25:57.103Z"
+  },
+  {
+    "id": 1774502423604,
+    "nome": "nathan barrios",
+    "empresa": "clinica 2oumais",
+    "fone": "67992890601",
+    "email": "",
+    "valor": "1500",
+    "fonte": "Google",
+    "etapa": "novo",
+    "obs": "lead bom",
+    "criadoEm": "2026-03-26T05:20:23.604Z"
+  }
+]

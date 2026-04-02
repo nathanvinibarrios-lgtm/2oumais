@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm start:*)",
+      "Bash(DRY_RUN=true node index.js 2>&1)",
+      "Bash(node:*)",
+      "Bash(npm run:*)",
+      "Skill(claude-api)",
+      "Bash(pkill -f 'node src/whatsapp.js')",
+      "Bash(node -e \":*)",
+      "Bash(pkill -f \"node src/whatsapp\")",
+      "Bash(pkill -f \"node -e\")"
+    ]
+  }
+}

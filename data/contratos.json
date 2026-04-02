@@ -1,0 +1,15 @@
+[
+  {
+    "id": 1774642892838,
+    "empresaNome": "MG Odontologia",
+    "representante": "Marcos César José Gomes",
+    "plano": "Plano 1R$ 1.850",
+    "valorMensal": "1.850,00",
+    "dataInicio": "2026-03-27",
+    "duracaoMeses": 6,
+    "dataFim": "2026-09-27",
+    "status": "ativo",
+    "diasRestantes": 184,
+    "criadoEm": "2026-03-27T20:21:32.838Z"
+  }
+]
