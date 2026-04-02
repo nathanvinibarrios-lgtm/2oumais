@@ -652,15 +652,19 @@ app.post("/api/crm/importar", autenticado, upload.single("arquivo"), (req, res) 
     let novos = 0;
 
     for (const row of rows) {
-      const nome  = String(row.nome || row.Nome || row.NOME || row.name || "").trim();
-      const fone  = String(row.fone || row.Fone || row.FONE || row.phone || row.whats || row.celular || row.telefone || "").replace(/\D/g, "").trim();
+      const nome  = String(row["Nome da Clínica"] || row["Nome da clinica"] || row.nome || row.Nome || row.NOME || row.name || row.empresa || row.Empresa || "").trim();
+      const fone  = String(row.Telefone || row.telefone || row.fone || row.Fone || row.FONE || row.phone || row.whats || row.celular || "").replace(/\D/g, "").trim();
       const email = String(row.email || row.Email || row.EMAIL || "").trim();
-      const empresa = String(row.empresa || row.Empresa || row.EMPRESA || "").trim();
+      const empresa = String(row["Nome da Clínica"] || row["Nome da clinica"] || row.empresa || row.Empresa || row.EMPRESA || "").trim();
 
       if (!fone) continue;
       if (fonesExistentes.has(fone)) continue;
 
-      lista.unshift({ id: Date.now() + novos, nome: nome || fone, empresa, fone, email, valor: "", fonte: "Importação", etapa: "novo", obs: "", criadoEm: new Date().toISOString() });
+      const site = String(row.Site || row.site || row.website || "").trim();
+      const endereco = String(row["Endereço"] || row.endereco || row.Endereço || "").trim();
+      const avaliacao = String(row["Avaliação"] || row.avaliacao || "").trim();
+      const obs = [site && `Site: ${site}`, endereco && `Endereço: ${endereco}`, avaliacao && `Avaliação: ${avaliacao}`].filter(Boolean).join(" | ");
+      lista.unshift({ id: Date.now() + novos, nome: nome || fone, empresa, fone, email, valor: "", fonte: "Importação", etapa: "novo", obs, criadoEm: new Date().toISOString() });
       fonesExistentes.add(fone);
       novos++;
     }
