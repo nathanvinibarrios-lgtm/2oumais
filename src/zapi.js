@@ -19,8 +19,13 @@ const client = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // ── CRM ───────────────────────────────────────────────────────────────────────
 
-const CRM_FILE   = path.join(__dirname, "../data/crm.json");
-const CHATS_FILE = path.join(__dirname, "../data/chats.json");
+const CRM_FILE       = path.join(__dirname, "../data/crm.json");
+const CHATS_FILE     = path.join(__dirname, "../data/chats.json");
+const BOT_OFF_FILE   = path.join(__dirname, "../data/bot-global-off");
+
+function botGlobalOff() { return fs.existsSync(BOT_OFF_FILE); }
+function desativarBotGlobal() { fs.mkdirSync(path.dirname(BOT_OFF_FILE), { recursive: true }); fs.writeFileSync(BOT_OFF_FILE, ""); }
+function ativarBotGlobal() { try { fs.unlinkSync(BOT_OFF_FILE); } catch {} }
 
 function lerCRM() {
   try { if (fs.existsSync(CRM_FILE)) return JSON.parse(fs.readFileSync(CRM_FILE, "utf8")); } catch {}
@@ -209,6 +214,9 @@ async function processarWebhook(body) {
 
   if (!texto || texto.startsWith("[")) return; // sem texto → não responde
 
+  // Bot global desativado
+  if (botGlobalOff()) { console.log("[ZAPI] Bot desativado globalmente — ignorando mensagem de", fone); return; }
+
   const isOwner = fone === OWNER_NUMBER;
 
   if (isOwner && texto.toLowerCase().startsWith(PREFIXO_DONO)) {
@@ -233,4 +241,4 @@ async function processarWebhook(body) {
   }
 }
 
-module.exports = { processarWebhook, enviarMensagem, getStatus, getQRCode, lerChats };
+module.exports = { processarWebhook, enviarMensagem, getStatus, getQRCode, lerChats, botGlobalOff, desativarBotGlobal, ativarBotGlobal };

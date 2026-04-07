@@ -796,6 +796,19 @@ app.post("/api/zapi/webhook", async (req, res) => {
   }
 });
 
+// Liga/desliga bot globalmente
+app.post("/api/bot/desativar", autenticado, (_req, res) => {
+  zapi.desativarBotGlobal();
+  res.json({ ok: true, status: "desativado" });
+});
+app.post("/api/bot/ativar", autenticado, (_req, res) => {
+  zapi.ativarBotGlobal();
+  res.json({ ok: true, status: "ativo" });
+});
+app.get("/api/bot/status-global", autenticado, (_req, res) => {
+  res.json({ ativo: !zapi.botGlobalOff() });
+});
+
 // Status e QR Code da instância Z-API
 app.get("/api/zapi/status", autenticado, async (_req, res) => {
   res.json(await zapi.getStatus());
