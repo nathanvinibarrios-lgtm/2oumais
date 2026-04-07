@@ -23,7 +23,7 @@ const CRM_FILE       = path.join(__dirname, "../data/crm.json");
 const CHATS_FILE     = path.join(__dirname, "../data/chats.json");
 const BOT_OFF_FILE   = path.join(__dirname, "../data/bot-global-off");
 
-function botGlobalOff() { return fs.existsSync(BOT_OFF_FILE); }
+function botGlobalOff() { return fs.existsSync(BOT_OFF_FILE) || process.env.BOT_LEADS_OFF === "true"; }
 function desativarBotGlobal() { fs.mkdirSync(path.dirname(BOT_OFF_FILE), { recursive: true }); fs.writeFileSync(BOT_OFF_FILE, ""); }
 function ativarBotGlobal() { try { fs.unlinkSync(BOT_OFF_FILE); } catch {} }
 
