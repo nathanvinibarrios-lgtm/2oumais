@@ -214,10 +214,10 @@ async function processarWebhook(body) {
 
   if (!texto || texto.startsWith("[")) return; // sem texto → não responde
 
-  // Bot global desativado
-  if (botGlobalOff()) { console.log("[ZAPI] Bot desativado globalmente — ignorando mensagem de", fone); return; }
-
   const isOwner = fone === OWNER_NUMBER;
+
+  // Bot global desativado — bloqueia só leads, não o dono
+  if (botGlobalOff() && !isOwner) { console.log("[ZAPI] Bot desativado globalmente — ignorando mensagem de", fone); return; }
 
   if (isOwner && texto.toLowerCase().startsWith(PREFIXO_DONO)) {
     const pergunta = texto.slice(PREFIXO_DONO.length).trim();
