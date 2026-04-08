@@ -22,10 +22,28 @@ const client = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
 const CRM_FILE       = path.join(__dirname, "../data/crm.json");
 const CHATS_FILE     = path.join(__dirname, "../data/chats.json");
 const BOT_OFF_FILE   = path.join(__dirname, "../data/bot-global-off");
+const PAUSADOS_FILE  = path.join(__dirname, "../data/bot-pausados.json");
 
 function botGlobalOff() { return fs.existsSync(BOT_OFF_FILE) || process.env.BOT_LEADS_OFF === "true"; }
 function desativarBotGlobal() { fs.mkdirSync(path.dirname(BOT_OFF_FILE), { recursive: true }); fs.writeFileSync(BOT_OFF_FILE, ""); }
 function ativarBotGlobal() { try { fs.unlinkSync(BOT_OFF_FILE); } catch {} }
+
+function lerPausados() {
+  try { if (fs.existsSync(PAUSADOS_FILE)) return JSON.parse(fs.readFileSync(PAUSADOS_FILE, "utf8")); } catch {}
+  return [];
+}
+function pausarBot(fone) {
+  const lista = lerPausados();
+  if (!lista.includes(fone)) { lista.push(fone); fs.mkdirSync(path.dirname(PAUSADOS_FILE), { recursive: true }); fs.writeFileSync(PAUSADOS_FILE, JSON.stringify(lista)); }
+  console.log(`[BOT] Pausado para ${fone}`);
+}
+function reativarBot(fone) {
+  const lista = lerPausados().filter(f => f !== fone);
+  fs.mkdirSync(path.dirname(PAUSADOS_FILE), { recursive: true });
+  fs.writeFileSync(PAUSADOS_FILE, JSON.stringify(lista));
+  console.log(`[BOT] Reativado para ${fone}`);
+}
+function botPausado(fone) { return lerPausados().includes(fone); }
 
 function lerCRM() {
   try { if (fs.existsSync(CRM_FILE)) return JSON.parse(fs.readFileSync(CRM_FILE, "utf8")); } catch {}
@@ -201,8 +219,19 @@ async function processarWebhook(body) {
   const nome = body.senderName || fone;
   const fromMe = body.fromMe || false;
 
-  // Ignora mensagens enviadas por nós mesmos (exceto dono com prefixo)
-  if (fromMe) return;
+  // Mensagem enviada por nós (dono respondeu manualmente no celular)
+  if (fromMe) {
+    const texto = body.text?.message || "";
+    // Comando: "claude reativar 5567999..." — reativa bot para um número
+    if (texto.toLowerCase().startsWith("claude reativar")) {
+      const numero = texto.replace(/\D/g, "").slice(-11); // pega só o número
+      if (numero) { reativarBot(numero); await enviarMensagem(fone, `✅ Bot reativado para ${numero}`); }
+    } else if (!texto.toLowerCase().startsWith("claude")) {
+      // Resposta manual para um lead → pausa o bot para esse lead
+      pausarBot(fone);
+    }
+    return;
+  }
 
   const texto = body.text?.message || body.image?.caption || body.audio?.audioUrl && "[áudio]" || body.document?.caption || "[mensagem]";
 
@@ -218,6 +247,9 @@ async function processarWebhook(body) {
 
   // Bot global desativado — bloqueia só leads, não o dono
   if (botGlobalOff() && !isOwner) { console.log("[ZAPI] Bot desativado globalmente — ignorando mensagem de", fone); return; }
+
+  // Bot pausado para este contato (dono assumiu a conversa)
+  if (botPausado(fone)) { console.log(`[ZAPI] Bot pausado para ${fone} — humano no controle`); return; }
 
   if (isOwner && texto.toLowerCase().startsWith(PREFIXO_DONO)) {
     const pergunta = texto.slice(PREFIXO_DONO.length).trim();
@@ -241,4 +273,4 @@ async function processarWebhook(body) {
   }
 }
 
-module.exports = { processarWebhook, enviarMensagem, getStatus, getQRCode, lerChats, botGlobalOff, desativarBotGlobal, ativarBotGlobal };
+module.exports = { processarWebhook, enviarMensagem, getStatus, getQRCode, lerChats, botGlobalOff, desativarBotGlobal, ativarBotGlobal, pausarBot, reativarBot, botPausado };
