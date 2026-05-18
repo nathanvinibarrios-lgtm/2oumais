@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1779073641691,
+    "contratoId": null,
+    "empresaNome": "JOELTON VARGAS PINTO",
+    "cnpj": "",
+    "ferramentas": [
+      "Meta"
+    ],
+    "verba": "1000",
+    "prazo": "2026-05-20",
+    "equipe": "felipe",
+    "etapa": "onboarding",
+    "obs": "",
+    "criadoEm": "2026-05-18T03:07:21.691Z"
+  }
+]

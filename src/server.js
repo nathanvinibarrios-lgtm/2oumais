@@ -8,6 +8,16 @@ const { gerarDocx, gerarPDF } = require("./contrato");
 
 const CONVERSOES_FILE  = path.join(__dirname, "../data/conversoes.json");
 const CONTRATOS_FILE   = path.join(__dirname, "../data/contratos.json");
+const OPERACOES_FILE         = path.join(__dirname, "../data/operacoes.json");
+const OPERACOES_COLUNAS_FILE = path.join(__dirname, "../data/operacoes-colunas.json");
+const FINANCEIRO_FILE        = path.join(__dirname, "../data/financeiro.json");
+const PAGAMENTOS_FILE        = path.join(__dirname, "../data/pagamentos.json");
+
+const DEFAULT_OPERACOES_COLUNAS = [
+  { key: "onboarding", label: "Onboarding / Briefing" },
+  { key: "criativos",  label: "Criativos + Planejamento" },
+  { key: "ativo",      label: "Ativo" },
+];
 const TEMPLATE_FILE    = path.join(__dirname, "../data/template-contrato.txt");
 const CRM_FILE         = path.join(__dirname, "../data/crm.json");
 const CRM_CONFIG_FILE  = path.join(__dirname, "../data/crm-config.json");
@@ -99,9 +109,22 @@ const PORT = process.env.PORT || 3000;
 const CPL_LIMITE = parseFloat(process.env.CPL_LIMITE || "50");
 const DRY_RUN = process.env.DRY_RUN === "true";
 const INTERVALO_MS = 5 * 60 * 1000;
-const LOGIN_USER = process.env.LOGIN_USER || "admin";
-const LOGIN_PASS = process.env.LOGIN_PASS || "admin";
 const SESSION_SECRET = process.env.SESSION_SECRET || "secret_padrao_troque";
+const USERS_FILE = path.join(__dirname, "../data/users.json");
+
+const crypto = require("crypto");
+function hashSenha(s) { return crypto.createHash("sha256").update(s).digest("hex"); }
+
+const ALL_VIEWS = ["campanhas","google","funil","crm","agenda","prospeccao","operacoes","financeiro","contratos"];
+
+function lerUsuarios() {
+  try { if (fs.existsSync(USERS_FILE)) return JSON.parse(fs.readFileSync(USERS_FILE, "utf8")); } catch {}
+  return [];
+}
+function salvarUsuarios(lista) {
+  fs.mkdirSync(path.dirname(USERS_FILE), { recursive: true });
+  fs.writeFileSync(USERS_FILE, JSON.stringify(lista, null, 2));
+}
 
 // Cache por período
 const caches = { 1: null, 7: null, 15: null };
@@ -312,13 +335,18 @@ app.use(session({
 }));
 
 function autenticado(req, res, next) {
-  if (req.session && req.session.logado) return next();
+  if (req.session && req.session.usuario) return next();
+  if (req.path.startsWith("/api/")) return res.status(401).json({ error: "não autenticado" });
   res.redirect("/login");
+}
+function apenasAdmin(req, res, next) {
+  if (req.session && req.session.admin) return next();
+  res.status(403).json({ error: "acesso restrito" });
 }
 
 // ── Login ──────────────────────────────────────────────
 app.get("/login", (req, res) => {
-  if (req.session.logado) return res.redirect("/");
+  if (req.session.usuario) return res.redirect("/");
   res.send(`<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -462,12 +490,61 @@ app.get("/login", (req, res) => {
 
 app.post("/login", (req, res) => {
   const { usuario, senha } = req.body || {};
-  if (usuario === LOGIN_USER && senha === LOGIN_PASS) {
-    req.session.logado = true;
+  const users = lerUsuarios();
+  const user = users.find(u => u.usuario === usuario && u.senhaHash === hashSenha(senha));
+  if (user) {
+    req.session.usuario = user.usuario;
+    req.session.nome    = user.nome;
+    req.session.views   = user.views || ALL_VIEWS;
+    req.session.admin   = user.admin === true;
     res.redirect("/");
   } else {
     res.redirect("/login?erro=1");
   }
+});
+
+// ── Gerenciar usuários (admin) ─────────────────────────────
+app.get("/api/usuarios", autenticado, apenasAdmin, (req, res) => {
+  res.json(lerUsuarios().map(u => ({ usuario: u.usuario, nome: u.nome, views: u.views, admin: u.admin || false })));
+});
+
+app.post("/api/usuarios", autenticado, apenasAdmin, (req, res) => {
+  const lista = lerUsuarios();
+  const { usuario, nome, senha, views, admin } = req.body;
+  if (!usuario || !nome || !senha) return res.status(400).json({ error: "usuario, nome e senha são obrigatórios" });
+  if (lista.find(u => u.usuario === usuario)) return res.status(400).json({ error: "usuário já existe" });
+  const novo = { usuario, nome, senhaHash: hashSenha(senha), views: views || ALL_VIEWS, admin: admin || false };
+  lista.push(novo);
+  salvarUsuarios(lista);
+  res.json({ usuario: novo.usuario, nome: novo.nome, views: novo.views, admin: novo.admin });
+});
+
+app.patch("/api/usuarios/:usuario", autenticado, apenasAdmin, (req, res) => {
+  const lista = lerUsuarios();
+  const idx = lista.findIndex(u => u.usuario === req.params.usuario);
+  if (idx < 0) return res.status(404).json({ error: "não encontrado" });
+  const { nome, senha, views, admin } = req.body;
+  if (nome)   lista[idx].nome  = nome;
+  if (senha)  lista[idx].senhaHash = hashSenha(senha);
+  if (views)  lista[idx].views = views;
+  if (admin !== undefined) lista[idx].admin = admin;
+  salvarUsuarios(lista);
+  res.json({ usuario: lista[idx].usuario, nome: lista[idx].nome, views: lista[idx].views, admin: lista[idx].admin });
+});
+
+app.delete("/api/usuarios/:usuario", autenticado, apenasAdmin, (req, res) => {
+  if (req.params.usuario === req.session.usuario) return res.status(400).json({ error: "não pode excluir a si mesmo" });
+  salvarUsuarios(lerUsuarios().filter(u => u.usuario !== req.params.usuario));
+  res.json({ ok: true });
+});
+
+app.get("/api/me", autenticado, (req, res) => {
+  res.json({
+    usuario: req.session.usuario,
+    nome:    req.session.nome,
+    views:   req.session.views,
+    admin:   req.session.admin || false,
+  });
 });
 
 app.get("/logout", (req, res) => {
@@ -524,6 +601,16 @@ function registrarContrato(dados) {
   } catch (e) { console.error("[REGISTRAR CONTRATO]", e.message); }
 }
 
+app.post("/api/contrato/registrar", autenticado, (req, res) => {
+  try {
+    registrarContrato(req.body);
+    const lista = lerContratos();
+    res.json(lista[0]);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.post("/api/contrato/docx", autenticado, async (req, res) => {
   try {
     const buffer = await gerarDocx(req.body);
@@ -571,10 +658,16 @@ app.patch("/api/contratos/:id", autenticado, (req, res) => {
   const lista = lerContratos();
   const idx = lista.findIndex(c => String(c.id) === req.params.id);
   if (idx < 0) return res.status(404).json({ error: "não encontrado" });
-  const { dataInicio, duracaoMeses, valorMensal } = req.body;
-  if (dataInicio)   lista[idx].dataInicio   = dataInicio;
-  if (duracaoMeses) lista[idx].duracaoMeses = parseInt(duracaoMeses);
-  if (valorMensal)  lista[idx].valorMensal  = valorMensal;
+  const { dataInicio, duracaoMeses, valorMensal, permuta, valorEfetivo, excluirReceita, servico, dataFim } = req.body;
+  if (dataInicio)                   lista[idx].dataInicio     = dataInicio;
+  if (duracaoMeses)                 lista[idx].duracaoMeses   = parseInt(duracaoMeses);
+  if (valorMensal)                  lista[idx].valorMensal    = valorMensal;
+  if (permuta !== undefined)        lista[idx].permuta        = permuta;
+  if (valorEfetivo !== undefined)   lista[idx].valorEfetivo   = valorEfetivo;
+  if (excluirReceita !== undefined) lista[idx].excluirReceita = excluirReceita;
+  if (servico !== undefined)        lista[idx].servico        = servico;
+  if (dataFim !== undefined)        lista[idx].dataFim        = dataFim;
+  if (req.body.diaPagamento !== undefined) lista[idx].diaPagamento = req.body.diaPagamento;
   const calc = calcularStatus(lista[idx].dataInicio, lista[idx].duracaoMeses);
   lista[idx] = { ...lista[idx], ...calc };
   salvarContratos(lista);
@@ -919,6 +1012,153 @@ app.patch("/api/agenda/:id", autenticado, (req, res) => {
 
 app.delete("/api/agenda/:id", autenticado, (req, res) => {
   salvarAgenda(lerAgenda().filter(i => String(i.id) !== req.params.id));
+  res.json({ ok: true });
+});
+
+// ── OPERAÇÕES ──────────────────────────────────────────────
+function lerOperacoesColunas() {
+  try { if (fs.existsSync(OPERACOES_COLUNAS_FILE)) return JSON.parse(fs.readFileSync(OPERACOES_COLUNAS_FILE, "utf8")); } catch {}
+  return DEFAULT_OPERACOES_COLUNAS;
+}
+function salvarOperacoesColunas(lista) {
+  fs.mkdirSync(path.dirname(OPERACOES_COLUNAS_FILE), { recursive: true });
+  fs.writeFileSync(OPERACOES_COLUNAS_FILE, JSON.stringify(lista, null, 2));
+}
+
+app.get("/api/operacoes-colunas", autenticado, (_req, res) => res.json(lerOperacoesColunas()));
+app.post("/api/operacoes-colunas", autenticado, (req, res) => {
+  if (!Array.isArray(req.body)) return res.status(400).json({ error: "esperado array" });
+  salvarOperacoesColunas(req.body);
+  res.json({ ok: true });
+});
+
+function lerOperacoes() {
+  try { if (fs.existsSync(OPERACOES_FILE)) return JSON.parse(fs.readFileSync(OPERACOES_FILE, "utf8")); } catch {}
+  return [];
+}
+function salvarOperacoes(lista) {
+  fs.mkdirSync(path.dirname(OPERACOES_FILE), { recursive: true });
+  fs.writeFileSync(OPERACOES_FILE, JSON.stringify(lista, null, 2));
+}
+
+app.get("/api/operacoes", autenticado, (req, res) => {
+  res.json(lerOperacoes());
+});
+
+app.post("/api/operacoes", autenticado, (req, res) => {
+  const lista = lerOperacoes();
+  const item = {
+    id:          Date.now(),
+    contratoId:  req.body.contratoId  || null,
+    empresaNome: req.body.empresaNome || "",
+    cnpj:        req.body.cnpj        || "",
+    ferramentas: req.body.ferramentas || [],
+    verba:       req.body.verba       || "",
+    prazo:       req.body.prazo       || "",
+    equipe:      req.body.equipe      || "felipe",
+    etapa:       req.body.etapa       || "onboarding",
+    obs:         req.body.obs         || "",
+    criadoEm:    new Date().toISOString(),
+  };
+  lista.push(item);
+  salvarOperacoes(lista);
+  res.json(item);
+});
+
+app.patch("/api/operacoes/:id", autenticado, (req, res) => {
+  const lista = lerOperacoes();
+  const idx = lista.findIndex(i => String(i.id) === req.params.id);
+  if (idx < 0) return res.status(404).json({ error: "não encontrado" });
+  lista[idx] = { ...lista[idx], ...req.body, id: lista[idx].id };
+  salvarOperacoes(lista);
+  res.json(lista[idx]);
+});
+
+app.delete("/api/operacoes/:id", autenticado, (req, res) => {
+  salvarOperacoes(lerOperacoes().filter(i => String(i.id) !== req.params.id));
+  res.json({ ok: true });
+});
+
+// ── FINANCEIRO ─────────────────────────────────────────────
+function lerFinanceiro() {
+  try { if (fs.existsSync(FINANCEIRO_FILE)) return JSON.parse(fs.readFileSync(FINANCEIRO_FILE, "utf8")); } catch {}
+  return [];
+}
+function salvarFinanceiro(lista) {
+  fs.mkdirSync(path.dirname(FINANCEIRO_FILE), { recursive: true });
+  fs.writeFileSync(FINANCEIRO_FILE, JSON.stringify(lista, null, 2));
+}
+
+app.get("/api/financeiro", autenticado, (req, res) => {
+  const { mes } = req.query;
+  let lista = lerFinanceiro();
+  if (mes) lista = lista.filter(i => i.mes === mes);
+  res.json(lista);
+});
+
+app.post("/api/financeiro", autenticado, (req, res) => {
+  const lista = lerFinanceiro();
+  const item = {
+    id:        Date.now(),
+    mes:       req.body.mes       || "",
+    tipo:      req.body.tipo      || "despesa",
+    categoria: req.body.categoria || "outras",
+    descricao: req.body.descricao || "",
+    valor:     parseFloat(req.body.valor) || 0,
+    criadoEm:  new Date().toISOString(),
+  };
+  lista.push(item);
+  salvarFinanceiro(lista);
+  res.json(item);
+});
+
+app.patch("/api/financeiro/:id", autenticado, (req, res) => {
+  const lista = lerFinanceiro();
+  const idx = lista.findIndex(i => String(i.id) === req.params.id);
+  if (idx < 0) return res.status(404).json({ error: "não encontrado" });
+  if (req.body.valor !== undefined) req.body.valor = parseFloat(req.body.valor) || 0;
+  lista[idx] = { ...lista[idx], ...req.body, id: lista[idx].id };
+  salvarFinanceiro(lista);
+  res.json(lista[idx]);
+});
+
+app.delete("/api/financeiro/:id", autenticado, (req, res) => {
+  salvarFinanceiro(lerFinanceiro().filter(i => String(i.id) !== req.params.id));
+  res.json({ ok: true });
+});
+
+// ── PAGAMENTOS ─────────────────────────────────────────────
+function lerPagamentos() {
+  try { if (fs.existsSync(PAGAMENTOS_FILE)) return JSON.parse(fs.readFileSync(PAGAMENTOS_FILE, "utf8")); } catch {}
+  return [];
+}
+function salvarPagamentos(lista) {
+  fs.mkdirSync(path.dirname(PAGAMENTOS_FILE), { recursive: true });
+  fs.writeFileSync(PAGAMENTOS_FILE, JSON.stringify(lista, null, 2));
+}
+
+app.get("/api/pagamentos", autenticado, (req, res) => {
+  const { mes } = req.query;
+  let lista = lerPagamentos();
+  if (mes) lista = lista.filter(p => p.mes === mes);
+  res.json(lista);
+});
+
+app.post("/api/pagamentos", autenticado, (req, res) => {
+  const lista = lerPagamentos();
+  const { contratoId, mes } = req.body;
+  const existe = lista.findIndex(p => String(p.contratoId) === String(contratoId) && p.mes === mes);
+  if (existe >= 0) return res.json(lista[existe]);
+  const item = { id: Date.now(), contratoId: Number(contratoId), mes, pagoEm: new Date().toISOString() };
+  lista.push(item);
+  salvarPagamentos(lista);
+  res.json(item);
+});
+
+app.delete("/api/pagamentos/:contratoId/:mes", autenticado, (req, res) => {
+  salvarPagamentos(lerPagamentos().filter(p =>
+    !(String(p.contratoId) === req.params.contratoId && p.mes === req.params.mes)
+  ));
   res.json({ ok: true });
 });
 

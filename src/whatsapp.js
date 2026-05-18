@@ -237,8 +237,19 @@ async function responder(numero, mensagem, systemPrompt, isDono = false) {
 
 // ── Lógica de roteamento ──────────────────────────────────────────────────────
 
-function eLeadCRM(fone) {
-  return lerCRMLocal().some(l => l.fone === fone);
+// ── Lista de disparados ───────────────────────────────────────────────────────
+
+const DISPARADOS_FILE = path.join(__dirname, "../data/disparados.json");
+
+function lerDisparados() {
+  try {
+    if (fs.existsSync(DISPARADOS_FILE)) return JSON.parse(fs.readFileSync(DISPARADOS_FILE, "utf8"));
+  } catch {}
+  return [];
+}
+
+function foiDisparado(fone) {
+  return lerDisparados().includes(fone);
 }
 
 function classificarMensagem(numero, texto) {
@@ -257,8 +268,8 @@ function classificarMensagem(numero, texto) {
     return { tipo: "ignorar" };
   }
 
-  // 3. Só responde se o número estiver no CRM (veio do formulário Meta)
-  if (!eLeadCRM(fone)) {
+  // 3. Só responde quem recebeu disparo
+  if (!foiDisparado(fone)) {
     return { tipo: "ignorar" };
   }
 

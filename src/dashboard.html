@@ -603,6 +603,144 @@
     .modal-btn-cancel { background: #f3f4f6; color: #666; }
     .modal-btn-cancel:hover { background: #e5e7eb; }
 
+    /* ── OPERAÇÕES KANBAN ────────────────────────────── */
+    .btn-primary {
+      background: #6366f1; color: #fff; border: none; border-radius: 9px;
+      padding: 9px 18px; font-size: 13px; font-weight: 700; cursor: pointer;
+      font-family: inherit; transition: all .15s; box-shadow: 0 2px 8px rgba(99,102,241,.3);
+    }
+    .btn-primary:hover { background: #4f46e5; transform: translateY(-1px); }
+    .ops-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+    .ops-kanban { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; align-items: start; }
+    .ops-col {
+      background: #f8fafc; border-radius: 14px; padding: 14px; min-height: 200px;
+      border: 1.5px solid #e2e8f0; transition: background .15s;
+    }
+    .ops-col.drag-over { background: #ede9fe; border-color: #6366f1; }
+    .ops-col-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1.5px solid #e2e8f0;
+    }
+    .ops-col-title { font-size: 13px; font-weight: 700; color: #0f172a; }
+    .ops-col-count {
+      background: #e2e8f0; color: #64748b; font-size: 11px; font-weight: 700;
+      padding: 2px 8px; border-radius: 20px; min-width: 22px; text-align: center;
+    }
+    .ops-col.col-onboarding .ops-col-count { background: #dbeafe; color: #2563eb; }
+    .ops-col.col-criativos .ops-col-count  { background: #fef9c3; color: #b45309; }
+    .ops-col.col-ativo .ops-col-count      { background: #dcfce7; color: #16a34a; }
+    .ops-cards { display: flex; flex-direction: column; gap: 8px; min-height: 60px; }
+    .ops-card {
+      background: #fff; border-radius: 10px; padding: 13px 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.07); cursor: grab; transition: box-shadow .15s, opacity .15s;
+      border-left: 4px solid #6366f1; position: relative;
+    }
+    .ops-card.dragging { opacity: .4; cursor: grabbing; }
+    .ops-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.13); }
+    .ops-card.equipe-daniel { border-left-color: #f59e0b; }
+    .ops-card.equipe-felipe { border-left-color: #6366f1; }
+    .ops-card-nome { font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 5px; }
+    .ops-card-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 6px; }
+    .ops-tag {
+      font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 5px;
+      text-transform: uppercase; letter-spacing: .3px;
+    }
+    .ops-tag.meta   { background: #dbeafe; color: #1d4ed8; }
+    .ops-tag.google { background: #dcfce7; color: #166534; }
+    .ops-tag.crm    { background: #f3e8ff; color: #7e22ce; }
+    .ops-card-info { font-size: 11px; color: #94a3b8; display: flex; gap: 10px; flex-wrap: wrap; }
+    .ops-card-equipe {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+      margin-top: 6px;
+    }
+    .ops-card-equipe.equipe-felipe  { background: #ede9fe; color: #6366f1; }
+    .ops-card-equipe.equipe-daniel  { background: #fef3c7; color: #d97706; }
+
+    /* Modal de operação */
+    .ops-modal-box { background: #fff; border-radius: 16px; padding: 28px; width: 500px; max-width: 95vw; box-shadow: 0 20px 60px rgba(0,0,0,.2); max-height: 90vh; overflow-y: auto; }
+    .ops-modal-box h4 { font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 20px; }
+    .ops-modal-section { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #94a3b8; letter-spacing: .6px; margin: 16px 0 8px; }
+    .ops-ferr-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+    .ops-ferr-check { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .ops-ferr-check input { width: 16px; height: 16px; accent-color: #6366f1; cursor: pointer; }
+    .ops-delete-btn { background: none; border: none; color: #ef4444; font-size: 12px; font-weight: 700; cursor: pointer; padding: 0; text-decoration: underline; }
+    .ops-delete-btn:hover { color: #b91c1c; }
+    .ops-col-remove { background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 14px; padding: 2px 5px; border-radius: 4px; line-height: 1; }
+    .ops-col-remove:hover { color: #ef4444; background: #fee2e2; }
+    .ops-col-input { flex:1; padding: 8px 10px; border: 1.5px solid #e2e8f0; border-radius: 7px; font-size: 13px; font-family: inherit; }
+    .ops-col-input:focus { outline: none; border-color: #6366f1; }
+
+    /* ── FINANCEIRO / DRE ───────────────────────────── */
+    .fin-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 12px; margin-bottom: 28px; }
+    .fin-card { background:#fff; border-radius:12px; padding:16px 18px; border:1px solid #e2e8f0; box-shadow:0 1px 3px rgba(0,0,0,.04); }
+    .fin-card-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#94a3b8; margin-bottom:6px; }
+    .fin-card-value { font-size:22px; font-weight:800; color:#0f172a; }
+    .fin-card-value.positivo { color:#16a34a; }
+    .fin-card-value.negativo { color:#dc2626; }
+    .fin-card-sub { font-size:11px; color:#94a3b8; margin-top:3px; }
+
+    .fin-periodo { display:flex; align-items:center; gap:10px; margin-bottom:24px; flex-wrap:wrap; }
+    .fin-periodo label { font-size:13px; font-weight:600; color:#64748b; }
+    .fin-periodo select { padding:8px 12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:13px; font-family:inherit; }
+
+    .dre-wrapper { background:#fff; border-radius:14px; border:1px solid #e2e8f0; overflow:hidden; margin-bottom:20px; }
+    .dre-section-header {
+      display:grid; grid-template-columns:1fr auto;
+      padding:12px 20px; background:#f8fafc;
+      font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.6px; color:#64748b;
+      border-bottom:1px solid #e2e8f0;
+    }
+    .dre-row {
+      display:grid; grid-template-columns:28px 1fr auto auto;
+      align-items:center; gap:8px; padding:11px 20px;
+      border-bottom:1px solid #f1f5f9; transition:background .1s;
+    }
+    .dre-row:last-child { border-bottom:none; }
+    .dre-row:hover { background:#f8fafc; }
+    .dre-row-icon { font-size:15px; text-align:center; }
+    .dre-row-label { font-size:13px; color:#334155; }
+    .dre-row-label.sub { color:#64748b; font-size:12px; padding-left:8px; }
+    .dre-row-value { font-size:13px; font-weight:700; color:#0f172a; text-align:right; white-space:nowrap; }
+    .dre-row-value.despesa { color:#dc2626; }
+    .dre-row-value.receita { color:#16a34a; }
+    .dre-row-actions { display:flex; gap:4px; opacity:0; transition:opacity .1s; }
+    .dre-row:hover .dre-row-actions { opacity:1; }
+    .dre-action-btn { background:none; border:none; cursor:pointer; font-size:13px; padding:3px 5px; border-radius:5px; color:#94a3b8; }
+    .dre-action-btn:hover { background:#f1f5f9; color:#334155; }
+
+    .dre-total {
+      display:grid; grid-template-columns:1fr auto;
+      padding:14px 20px; font-size:14px; font-weight:800;
+    }
+    .dre-total.receita-total { background:#f0fdf4; color:#15803d; border-top:2px solid #bbf7d0; }
+    .dre-total.despesa-total { background:#fef2f2; color:#b91c1c; border-top:2px solid #fecaca; }
+    .dre-total.resultado-positivo { background:#f0fdf4; color:#15803d; border-top:2px solid #16a34a; font-size:16px; }
+    .dre-total.resultado-negativo { background:#fef2f2; color:#b91c1c; border-top:2px solid #dc2626; font-size:16px; }
+
+    .fin-add-btn { display:flex; align-items:center; gap:6px; padding:9px 16px; border-radius:8px; border:1.5px dashed #cbd5e1; background:none; color:#64748b; font-size:13px; font-weight:600; cursor:pointer; transition:all .15s; font-family:inherit; }
+    .fin-add-btn:hover { border-color:#6366f1; color:#6366f1; background:#f5f3ff; }
+
+    /* ── Pagamentos ─────────────────────────────────── */
+    .pgto-btn {
+      display:inline-flex; align-items:center; gap:4px;
+      font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px;
+      border:none; cursor:pointer; font-family:inherit; transition:all .15s; white-space:nowrap;
+    }
+    .pgto-btn.pago     { background:#dcfce7; color:#16a34a; }
+    .pgto-btn.pago:hover { background:#bbf7d0; }
+    .pgto-btn.pendente { background:#fef9c3; color:#b45309; }
+    .pgto-btn.pendente:hover { background:#fef08a; }
+    .pgto-btn.atrasado { background:#fee2e2; color:#dc2626; }
+    .pgto-btn.atrasado:hover { background:#fecaca; }
+
+    /* ── Tooltip gráfico ───────────────────────────── */
+    .chart-tooltip {
+      position:fixed; background:#1e293b; color:#fff; font-size:12px; font-weight:600;
+      padding:8px 12px; border-radius:8px; pointer-events:none; z-index:9999;
+      line-height:1.7; white-space:nowrap; box-shadow:0 4px 16px rgba(0,0,0,.2);
+    }
+
     /* ── Chat modal ───────────────────────────────── */
     .chat-modal { width: 420px; max-width: 95vw; padding: 0; overflow: hidden; display: flex; flex-direction: column; height: 600px; max-height: 90vh; }
     .chat-header { padding: 18px 20px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; }
@@ -634,33 +772,49 @@
 
   <nav class="sidebar-nav">
     <div class="sidebar-section">Principal</div>
-    <button class="sidebar-item active" onclick="trocarView('campanhas')">
+    <button class="sidebar-item active" onclick="trocarView('campanhas')" data-view="campanhas">
       <span class="sidebar-item-icon">📊</span> Meta Ads
     </button>
-    <button class="sidebar-item" onclick="trocarView('google')">
+    <button class="sidebar-item" onclick="trocarView('google')" data-view="google">
       <span class="sidebar-item-icon">🔍</span> Google Ads
     </button>
-    <button class="sidebar-item" onclick="trocarView('funil')">
+    <button class="sidebar-item" onclick="trocarView('funil')" data-view="funil">
       <span class="sidebar-item-icon">🔻</span> Funil de Vendas
     </button>
-    <button class="sidebar-item" onclick="trocarView('crm')">
+    <button class="sidebar-item" onclick="trocarView('crm')" data-view="crm">
       <span class="sidebar-item-icon">🤝</span> CRM
     </button>
-    <button class="sidebar-item" onclick="trocarView('agenda')">
+    <button class="sidebar-item" onclick="trocarView('agenda')" data-view="agenda">
       <span class="sidebar-item-icon">📅</span> Agenda
     </button>
-
-    <button class="sidebar-item" onclick="trocarView('prospeccao')">
+    <button class="sidebar-item" onclick="trocarView('prospeccao')" data-view="prospeccao">
       <span class="sidebar-item-icon">🚀</span> Prospecção
     </button>
 
+    <div class="sidebar-section" style="margin-top:8px">Operacional</div>
+    <button class="sidebar-item" onclick="trocarView('operacoes')" data-view="operacoes">
+      <span class="sidebar-item-icon">⚙️</span> Operações
+    </button>
+    <button class="sidebar-item" onclick="trocarView('financeiro')" data-view="financeiro">
+      <span class="sidebar-item-icon">💰</span> Financeiro
+    </button>
+
     <div class="sidebar-section" style="margin-top:8px">Documentos</div>
-    <button class="sidebar-item" onclick="trocarView('contratos')">
+    <button class="sidebar-item" onclick="trocarView('contratos')" data-view="contratos">
       <span class="sidebar-item-icon">📄</span> Contratos
+    </button>
+
+    <div class="sidebar-section" style="margin-top:8px" id="sidebar-section-admin" style="display:none">Admin</div>
+    <button class="sidebar-item" id="sidebar-btn-usuarios" onclick="trocarView('usuarios')" style="display:none">
+      <span class="sidebar-item-icon">👤</span> Usuários
     </button>
   </nav>
 
   <div class="sidebar-bottom">
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;margin-bottom:2px">
+      <span style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0" id="sidebar-usuario-avatar">?</span>
+      <span style="font-size:12px;font-weight:700;color:#334155" id="sidebar-usuario-nome">...</span>
+    </div>
     <div class="sidebar-status">
       <div class="dot"></div>
       <span id="next-update">Atualizando...</span>
@@ -1227,6 +1381,351 @@ _______________________________
 
   </div><!-- /view-contratos -->
 
+  <!-- ── VIEW USUÁRIOS ─────────────────────────────────── -->
+  <div class="view" id="view-usuarios">
+    <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div class="page-title">👤 Usuários</div>
+        <div class="page-sub">Gerencie quem acessa o dashboard</div>
+      </div>
+      <button class="btn-primary" onclick="abrirModalUsuario()">+ Novo usuário</button>
+    </div>
+    <div id="usuarios-lista" style="display:flex;flex-direction:column;gap:10px;max-width:680px"></div>
+  </div><!-- /view-usuarios -->
+
+  <!-- Modal usuário -->
+  <div class="modal-overlay hidden" id="modal-usuario" onclick="if(event.target===this)fecharModalUsuario()">
+    <div class="modal-box" style="width:460px;max-width:95vw" onclick="event.stopPropagation()">
+      <h4 id="usuario-modal-titulo">Novo Usuário</h4>
+      <input type="hidden" id="usuario-id"/>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div class="form-group">
+          <label>Login *</label>
+          <input type="text" id="usuario-login" placeholder="ex: joao" autocomplete="off"/>
+        </div>
+        <div class="form-group">
+          <label>Nome *</label>
+          <input type="text" id="usuario-nome" placeholder="ex: João Silva"/>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:10px">
+        <label id="usuario-senha-label">Senha *</label>
+        <input type="password" id="usuario-senha" placeholder="••••••••" autocomplete="new-password"/>
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#64748b;margin-bottom:8px;display:block">Acesso às abas</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="usuario-views-grid"></div>
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:600">
+          <input type="checkbox" id="usuario-admin" style="width:16px;height:16px;accent-color:#6366f1">
+          Administrador (acesso total + gerenciar usuários)
+        </label>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <button class="ops-delete-btn" id="usuario-btn-delete" onclick="excluirUsuario()" style="display:none">Excluir usuário</button>
+        <div class="modal-actions" style="flex:1;margin-top:0;margin-left:auto;max-width:260px">
+          <button class="modal-btn modal-btn-cancel" onclick="fecharModalUsuario()">Cancelar</button>
+          <button class="modal-btn modal-btn-ok" onclick="salvarUsuario()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── VIEW FINANCEIRO ───────────────────────────────── -->
+  <div class="view" id="view-financeiro">
+    <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div>
+        <div class="page-title">💰 Financeiro</div>
+        <div class="page-sub">DRE — Demonstração de Resultado</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-primary" style="background:#f1f5f9;color:#64748b;box-shadow:none;border:1.5px solid #e2e8f0" onclick="abrirModalNovoClienteFin()">+ Novo cliente</button>
+        <button class="btn-primary" onclick="abrirModalLancamento()">+ Lançamento</button>
+      </div>
+    </div>
+
+    <!-- Seletor de período -->
+    <div class="fin-periodo">
+      <label>Período:</label>
+      <select id="fin-mes-select" onchange="carregarFinanceiro()"></select>
+    </div>
+
+    <!-- Cards resumo -->
+    <div class="fin-cards">
+      <div class="fin-card">
+        <div class="fin-card-label">Clientes Ativos</div>
+        <div class="fin-card-value" id="fin-clientes">—</div>
+        <div class="fin-card-sub">contratos vigentes</div>
+      </div>
+      <div class="fin-card">
+        <div class="fin-card-label">Faturamento</div>
+        <div class="fin-card-value receita" id="fin-faturamento">—</div>
+        <div class="fin-card-sub">mensalidades + extras</div>
+      </div>
+      <div class="fin-card">
+        <div class="fin-card-label">Total Despesas</div>
+        <div class="fin-card-value negativo" id="fin-despesas-total">—</div>
+        <div class="fin-card-sub">todas as categorias</div>
+      </div>
+      <div class="fin-card">
+        <div class="fin-card-label">Resultado</div>
+        <div class="fin-card-value" id="fin-resultado">—</div>
+        <div class="fin-card-sub" id="fin-margem">margem: —</div>
+      </div>
+    </div>
+
+    <!-- DRE -->
+    <div id="fin-dre"></div>
+
+    <!-- Gráfico histórico -->
+    <div style="background:#fff;border-radius:14px;border:1px solid #e2e8f0;padding:20px 24px;margin-top:20px">
+      <div style="font-size:14px;font-weight:700;color:#0f172a;margin-bottom:4px">📈 Evolução mensal</div>
+      <div style="font-size:12px;color:#94a3b8;margin-bottom:20px">Últimos 6 meses</div>
+      <div id="fin-chart-legenda" style="display:flex;gap:18px;margin-bottom:12px;flex-wrap:wrap"></div>
+      <div id="fin-chart-container" style="overflow-x:auto">
+        <svg id="fin-chart" width="100%" style="min-width:480px;display:block"></svg>
+      </div>
+    </div>
+
+  </div><!-- /view-financeiro -->
+
+  <!-- ── VIEW OPERAÇÕES ────────────────────────────────── -->
+  <div class="view" id="view-operacoes">
+    <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div class="page-title">⚙️ Operações</div>
+        <div class="page-sub">Fluxo de trabalho dos clientes ativos</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-primary" style="background:#f1f5f9;color:#64748b;box-shadow:none;border:1.5px solid #e2e8f0" onclick="abrirModalGerenciarColunas()">⚙️ Colunas</button>
+        <button class="btn-primary" onclick="abrirModalNovaOp()">+ Novo cliente</button>
+      </div>
+    </div>
+
+    <!-- Legenda equipes -->
+    <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+      <span style="font-size:12px;font-weight:600;color:#64748b;">Equipes:</span>
+      <span class="ops-card-equipe equipe-felipe" style="margin-top:0">🟣 Felipe</span>
+      <span class="ops-card-equipe equipe-daniel" style="margin-top:0">🟡 Daniel &amp; William</span>
+    </div>
+
+    <div id="ops-kanban-container" class="ops-kanban"></div>
+  </div><!-- /view-operacoes -->
+
+  <!-- Modal financeiro: novo / editar lançamento -->
+  <div class="modal-overlay hidden" id="modal-fin" onclick="if(event.target===this)fecharModalFin()">
+    <div class="modal-box" style="width:440px;max-width:95vw" onclick="event.stopPropagation()">
+      <h4 id="fin-modal-titulo">Novo Lançamento</h4>
+      <input type="hidden" id="fin-id"/>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div class="form-group">
+          <label>Mês de referência</label>
+          <input type="month" id="fin-mes"/>
+        </div>
+        <div class="form-group">
+          <label>Tipo</label>
+          <select id="fin-tipo" onchange="fin_toggleCategoria()" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit">
+            <option value="despesa">💸 Despesa</option>
+            <option value="receita_extra">➕ Receita Extra</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" id="fin-categoria-row" style="margin-bottom:10px">
+        <label>Categoria</label>
+        <select id="fin-categoria" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit">
+          <option value="folha">👥 Folha / Freelancers</option>
+          <option value="ferramentas">🛠️ Ferramentas e Software</option>
+          <option value="infraestrutura">🏢 Infraestrutura / Aluguel</option>
+          <option value="impostos">📋 Impostos e Taxas</option>
+          <option value="marketing">📣 Marketing e Vendas</option>
+          <option value="outras">📦 Outras Despesas</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:10px">
+        <label>Descrição</label>
+        <input type="text" id="fin-descricao" placeholder="Ex: Salário João, Adobe CC..."/>
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label>Valor (R$)</label>
+        <input type="number" id="fin-valor" placeholder="0,00" min="0" step="0.01"/>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <button class="ops-delete-btn" id="fin-btn-delete" onclick="excluirLancamento()" style="display:none">Excluir</button>
+        <div class="modal-actions" style="flex:1;margin-top:0;margin-left:auto;max-width:260px">
+          <button class="modal-btn modal-btn-cancel" onclick="fecharModalFin()">Cancelar</button>
+          <button class="modal-btn modal-btn-ok" onclick="salvarLancamento()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal financeiro: editar contrato -->
+  <div class="modal-overlay hidden" id="modal-fin-contrato" onclick="if(event.target===this)fecharModalFinContrato()">
+    <div class="modal-box" style="width:420px;max-width:95vw" onclick="event.stopPropagation()">
+      <h4 id="fin-contrato-titulo">Editar Contrato</h4>
+      <input type="hidden" id="fin-contrato-id"/>
+
+      <div class="form-group" style="margin-bottom:10px">
+        <label>Serviço</label>
+        <select id="fin-contrato-servico" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit">
+          <option value="Tráfego Pago">Tráfego Pago</option>
+          <option value="Landing Page">Landing Page</option>
+          <option value="CRM">CRM</option>
+          <option value="Tráfego Pago + Landing Page">Tráfego Pago + Landing Page</option>
+          <option value="Tráfego Pago + CRM">Tráfego Pago + CRM</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="margin-bottom:10px">
+        <label>Valor do contrato (R$)</label>
+        <input type="text" id="fin-contrato-valor" placeholder="1.850,00"/>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+        <div class="form-group">
+          <label>Data de início</label>
+          <input type="date" id="fin-contrato-inicio"/>
+        </div>
+        <div class="form-group">
+          <label>Data de fim</label>
+          <input type="date" id="fin-contrato-fim"/>
+        </div>
+        <div class="form-group">
+          <label>Dia de pagamento</label>
+          <input type="number" id="fin-contrato-dia" min="1" max="31" placeholder="ex: 10"/>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <button class="ops-delete-btn" onclick="excluirContrato_fin()">Excluir contrato</button>
+        <div class="modal-actions" style="flex:1;margin-top:0;margin-left:auto;max-width:260px">
+          <button class="modal-btn modal-btn-cancel" onclick="fecharModalFinContrato()">Cancelar</button>
+          <button class="modal-btn modal-btn-ok" onclick="salvarContratoFinanceiro()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal novo cliente (financeiro) -->
+  <div class="modal-overlay hidden" id="modal-fin-novo-cliente" onclick="if(event.target===this)this.classList.add('hidden')">
+    <div class="modal-box" style="width:440px;max-width:95vw" onclick="event.stopPropagation()">
+      <h4>Novo Cliente</h4>
+      <div class="form-group" style="margin-bottom:10px">
+        <label>Nome / Empresa *</label>
+        <input type="text" id="fnc-nome" placeholder="Ex: Clínica Dr. João"/>
+      </div>
+      <div class="form-group" style="margin-bottom:10px">
+        <label>Representante</label>
+        <input type="text" id="fnc-representante" placeholder="Nome do responsável"/>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div class="form-group">
+          <label>Valor mensal (R$) *</label>
+          <input type="text" id="fnc-valor" placeholder="1.850,00"/>
+        </div>
+        <div class="form-group">
+          <label>Data de início *</label>
+          <input type="date" id="fnc-inicio"/>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:14px">
+        <label>Duração</label>
+        <select id="fnc-duracao" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit">
+          <option value="3">3 meses</option>
+          <option value="6" selected>6 meses</option>
+          <option value="8">8 meses</option>
+          <option value="12">12 meses</option>
+        </select>
+      </div>
+      <div class="modal-actions" style="margin-top:0">
+        <button class="modal-btn modal-btn-cancel" onclick="document.getElementById('modal-fin-novo-cliente').classList.add('hidden')">Cancelar</button>
+        <button class="modal-btn modal-btn-ok" onclick="salvarNovoClienteFin()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal gerenciar colunas -->
+  <div class="modal-overlay hidden" id="modal-ops-colunas" onclick="if(event.target===this)fecharModalColunas()">
+    <div class="modal-box" style="width:440px;max-width:95vw" onclick="event.stopPropagation()">
+      <h4>⚙️ Gerenciar Colunas</h4>
+      <div id="ops-colunas-lista" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
+      <button onclick="ops_addLinhaColuna()" style="width:100%;padding:9px;border:1.5px dashed #cbd5e1;background:none;border-radius:8px;font-size:13px;font-weight:600;color:#64748b;cursor:pointer">+ Adicionar coluna</button>
+      <div class="modal-actions" style="margin-top:16px">
+        <button class="modal-btn modal-btn-cancel" onclick="fecharModalColunas()">Cancelar</button>
+        <button class="modal-btn modal-btn-ok" onclick="salvarColunas()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de operação (novo / editar) -->
+  <div class="modal-overlay hidden" id="modal-ops" onclick="fecharModalOps(event)">
+    <div class="ops-modal-box" onclick="event.stopPropagation()">
+      <h4 id="ops-modal-titulo">Novo cliente</h4>
+      <input type="hidden" id="ops-id"/>
+
+      <div class="ops-modal-section">Cliente</div>
+      <div class="form-group" style="margin-bottom:10px">
+        <label>Buscar contrato existente</label>
+        <select id="ops-contrato-select" onchange="ops_preencherContrato(this.value)" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit">
+          <option value="">— selecione um contrato —</option>
+        </select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div class="form-group">
+          <label>Nome / Empresa</label>
+          <input type="text" id="ops-nome" placeholder="Nome do cliente"/>
+        </div>
+        <div class="form-group">
+          <label>CNPJ / CPF</label>
+          <input type="text" id="ops-cnpj" placeholder="00.000.000/0001-00"/>
+        </div>
+      </div>
+
+      <div class="ops-modal-section">Ferramentas</div>
+      <div class="ops-ferr-row">
+        <label class="ops-ferr-check"><input type="checkbox" id="ops-ferr-meta" value="Meta"> Meta Ads</label>
+        <label class="ops-ferr-check"><input type="checkbox" id="ops-ferr-google" value="Google"> Google Ads</label>
+        <label class="ops-ferr-check"><input type="checkbox" id="ops-ferr-crm" value="CRM"> CRM</label>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;margin-bottom:10px">
+        <div class="form-group">
+          <label>Verba de anúncio (R$)</label>
+          <input type="text" id="ops-verba" placeholder="ex: 2.000,00"/>
+        </div>
+        <div class="form-group">
+          <label>Prazo</label>
+          <input type="date" id="ops-prazo"/>
+        </div>
+      </div>
+
+      <div class="ops-modal-section">Equipe de tráfego</div>
+      <div style="display:flex;gap:16px;margin-bottom:10px">
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;cursor:pointer">
+          <input type="radio" name="ops-equipe" value="felipe" id="ops-eq-felipe" checked> 🟣 Felipe
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;cursor:pointer">
+          <input type="radio" name="ops-equipe" value="daniel" id="ops-eq-daniel"> 🟡 Daniel &amp; William
+        </label>
+      </div>
+
+      <div class="ops-modal-section">Etapa</div>
+      <select id="ops-etapa" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;margin-bottom:10px;font-family:inherit"></select>
+
+      <div class="ops-modal-section">Observações</div>
+      <textarea id="ops-obs" rows="3" placeholder="Anotações internas..." style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;resize:vertical;font-family:inherit;margin-bottom:14px"></textarea>
+
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <button class="ops-delete-btn" id="ops-btn-delete" onclick="excluirOp()" style="display:none">Excluir</button>
+        <div class="modal-actions" style="flex:1;margin-top:0;margin-left:auto;max-width:260px">
+          <button class="modal-btn modal-btn-cancel" onclick="fecharModalOpsForce()">Cancelar</button>
+          <button class="modal-btn modal-btn-ok" onclick="salvarOp()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ── VIEW CRM ───────────────────────────────────── -->
   <div class="view" id="view-crm">
     <div class="page-header">
@@ -1371,10 +1870,52 @@ Posso te mostrar como? 😊</textarea>
 <script>
   const INTERVALO = 5 * 60 * 1000;
   let periodoAtual = 1;
+  let ME = { usuario: '', nome: '', views: [], admin: false };
   let periodoFunilAtual = 1;
   let proximaAtualizacao = Date.now() + INTERVALO;
   let cacheData = {};
   let conversoes = {};
+
+
+  // Financeiro
+  let finLancamentos = [];
+  let finContratos   = [];
+  let finPagamentos  = [];
+  const FIN_CATEGORIAS = {
+    folha:          { label: 'Folha / Freelancers',      icon: '👥' },
+    ferramentas:    { label: 'Ferramentas e Software',   icon: '🛠️' },
+    infraestrutura: { label: 'Infraestrutura / Aluguel', icon: '🏢' },
+    impostos:       { label: 'Impostos e Taxas',         icon: '📋' },
+    marketing:      { label: 'Marketing e Vendas',       icon: '📣' },
+    outras:         { label: 'Outras Despesas',          icon: '📦' },
+  };
+
+  // Usuários
+  let usuariosData = [];
+  const VIEWS_LABELS = {
+    campanhas:  '📊 Meta Ads',
+    google:     '🔍 Google Ads',
+    funil:      '🔻 Funil de Vendas',
+    crm:        '🤝 CRM',
+    agenda:     '📅 Agenda',
+    prospeccao: '🚀 Prospecção',
+    operacoes:  '⚙️ Operações',
+    financeiro: '💰 Financeiro',
+    contratos:  '📄 Contratos',
+  };
+
+  // Operações
+  let opsData = [];
+  let opsContratosCache = [];
+  let opsColunas = [];
+  const OPS_COL_COLORS = [
+    { bg: '#dbeafe', color: '#2563eb' },
+    { bg: '#fef9c3', color: '#b45309' },
+    { bg: '#dcfce7', color: '#16a34a' },
+    { bg: '#f3e8ff', color: '#7e22ce' },
+    { bg: '#ffe4e6', color: '#be123c' },
+    { bg: '#e0f2fe', color: '#0369a1' },
+  ];
 
   const periodoLabels = { 1: 'Hoje (últimas 24h)', 7: 'Últimos 7 dias', 15: 'Últimos 15 dias' };
 
@@ -1807,7 +2348,13 @@ Posso te mostrar como? 😊</textarea>
     });
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById('view-' + view).classList.add('active');
-    if (view === 'contratos') {
+    if (view === 'usuarios') {
+      carregarUsuarios();
+    } else if (view === 'financeiro') {
+      iniciarFinanceiro();
+    } else if (view === 'operacoes') {
+      carregarOperacoes();
+    } else if (view === 'contratos') {
       carregarContratos();
     } else if (view === 'crm') {
       carregarCRM();
@@ -2357,7 +2904,8 @@ Posso te mostrar como? 😊</textarea>
   }
 
   // Fecha modal clicando fora
-  document.getElementById('modal-editar').addEventListener('click', function(e) {
+  const _modalEditar = document.getElementById('modal-editar');
+  if (_modalEditar) _modalEditar.addEventListener('click', function(e) {
     if (e.target === this) fecharModal();
   });
 
@@ -2440,6 +2988,22 @@ Posso te mostrar como? 😊</textarea>
   atualizar(1);
   setInterval(() => atualizar(viewAtual === 'funil' ? periodoFunilAtual : periodoAtual), INTERVALO);
   setInterval(atualizarRelogio, 1000);
+
+  // Carregar usuário e aplicar permissões
+  fetch('/api/me').then(r => r.json()).then(me => {
+    ME = me;
+    document.getElementById('sidebar-usuario-nome').textContent = me.nome;
+    document.getElementById('sidebar-usuario-avatar').textContent = me.nome.charAt(0).toUpperCase();
+    if (me.admin) {
+      document.getElementById('sidebar-btn-usuarios').style.display = 'flex';
+      document.getElementById('sidebar-section-admin').style.display = '';
+    }
+    // Ocultar itens sem permissão
+    document.querySelectorAll('[data-view]').forEach(el => {
+      if (!me.views.includes(el.dataset.view)) el.style.display = 'none';
+    });
+  }).catch(() => {});
+
 
   // ── GOOGLE ADS ──────────────────────────────────────────
 
@@ -2796,7 +3360,8 @@ Posso te mostrar como? 😊</textarea>
   }
 
   // Fecha chat ao clicar fora
-  document.getElementById('modal-chat').addEventListener('click', function(e) {
+  const _modalChat = document.getElementById('modal-chat');
+  if (_modalChat) _modalChat.addEventListener('click', function(e) {
     if (e.target === this) fecharChat();
   });
 
@@ -2891,6 +3456,871 @@ Posso te mostrar como? 😊</textarea>
     prospParar = true;
     document.getElementById('prosp-btn').style.display = 'inline-block';
     document.getElementById('prosp-stop').style.display = 'none';
+  }
+
+  // ── FINANCEIRO ─────────────────────────────────────────────
+
+  function fin_brl(v) {
+    return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function fin_parseBRL(s) {
+    if (typeof s === 'number') return s;
+    return parseFloat(String(s).replace(/\./g, '').replace(',', '.')) || 0;
+  }
+
+  function fin_mesAtual() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  }
+
+  function fin_preencherSelectMes() {
+    const sel = document.getElementById('fin-mes-select');
+    if (!sel) return;
+    const meses = [];
+    const hoje = new Date();
+    for (let i = 0; i < 12; i++) {
+      const d = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+      const val = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+      const label = d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+      meses.push(`<option value="${val}">${label.charAt(0).toUpperCase()+label.slice(1)}</option>`);
+    }
+    sel.innerHTML = meses.join('');
+  }
+
+  async function iniciarFinanceiro() {
+    fin_preencherSelectMes();
+    const [contRes] = await Promise.all([fetch('/api/contratos')]);
+    finContratos = await contRes.json();
+    await carregarFinanceiro();
+  }
+
+  async function carregarFinanceiro() {
+    const mes = document.getElementById('fin-mes-select')?.value || fin_mesAtual();
+    const [lancRes, pgtoRes] = await Promise.all([
+      fetch(`/api/financeiro?mes=${mes}`),
+      fetch(`/api/pagamentos?mes=${mes}`),
+    ]);
+    finLancamentos = await lancRes.json();
+    finPagamentos  = await pgtoRes.json();
+    fin_renderizar(mes);
+  }
+
+  function fin_valorContrato(c) {
+    // Usa valorEfetivo (após desconto) se existir, senão valorMensal
+    if (c.valorEfetivo !== undefined && c.valorEfetivo !== null && c.valorEfetivo !== '') {
+      return parseFloat(c.valorEfetivo) || 0;
+    }
+    return fin_parseBRL(c.valorMensal);
+  }
+
+  function fin_renderizar(mes) {
+    const ativos = finContratos.filter(c => c.status === 'ativo');
+    // Clientes ativos (permuta conta como cliente, mas não no faturamento)
+    document.getElementById('fin-clientes').textContent = ativos.length;
+
+    // Mensalidades: exclui permuta e excluídos, usa valorEfetivo se definido
+    const ativosCobranca = ativos.filter(c => !c.permuta && !c.excluirReceita);
+    const mensalidades = ativosCobranca.reduce((s, c) => s + fin_valorContrato(c), 0);
+
+    const receitasExtra = finLancamentos.filter(l => l.tipo === 'receita_extra');
+    const totalReceitaExtra = receitasExtra.reduce((s, l) => s + l.valor, 0);
+    const receitaTotal = mensalidades + totalReceitaExtra;
+
+    const despesas = finLancamentos.filter(l => l.tipo === 'despesa');
+    const totalDespesas = despesas.reduce((s, l) => s + l.valor, 0);
+
+    const resultado = receitaTotal - totalDespesas;
+    const margem = receitaTotal > 0 ? ((resultado / receitaTotal) * 100).toFixed(1) : 0;
+
+    document.getElementById('fin-faturamento').textContent = fin_brl(receitaTotal);
+    document.getElementById('fin-despesas-total').textContent = fin_brl(totalDespesas);
+    const elRes = document.getElementById('fin-resultado');
+    elRes.textContent = fin_brl(resultado);
+    elRes.className = 'fin-card-value ' + (resultado >= 0 ? 'positivo' : 'negativo');
+    document.getElementById('fin-margem').textContent = `margem: ${margem}%`;
+
+    document.getElementById('fin-dre').innerHTML = fin_dreHTML(ativos, mensalidades, receitasExtra, receitaTotal, despesas, totalDespesas, resultado);
+    renderizarGrafico();
+  }
+
+  function fin_dreHTML(ativos, mensalidades, receitasExtra, receitaTotal, despesas, totalDespesas, resultado) {
+    // ─ RECEITAS ─
+    const ativosCobranca = ativos.filter(c => !c.permuta);
+
+    let receitasRows = `
+      <div class="dre-row" style="background:#f0fdf4">
+        <span class="dre-row-icon">🏦</span>
+        <span class="dre-row-label" style="font-weight:700">Mensalidades (${ativosCobranca.length} clientes)</span>
+        <span class="dre-row-value receita">${fin_brl(mensalidades)}</span>
+        <span class="dre-row-actions"></span>
+      </div>`;
+
+    // Contratos
+    const mesSelecionado = document.getElementById('fin-mes-select')?.value || fin_mesAtual();
+    const [anoMes, moMes] = mesSelecionado.split('-').map(Number);
+    const hoje = new Date();
+
+    let num = 1;
+    ativos.forEach(c => {
+      const valor = fin_valorContrato(c);
+      const isPermuta = !!c.permuta;
+      const isExcluido = !!c.excluirReceita;
+      const temDesconto = !isPermuta && !isExcluido && c.valorEfetivo != null && c.valorEfetivo !== '' && parseFloat(c.valorEfetivo) !== fin_parseBRL(c.valorMensal);
+      const descontoTxt = temDesconto ? ` <span style="font-size:10px;color:#94a3b8;text-decoration:line-through">${fin_brl(fin_parseBRL(c.valorMensal))}</span>` : '';
+
+      // Badge dias restantes
+      const dias = c.diasRestantes ?? null;
+      const dataFimFmt = c.dataFim ? new Date(c.dataFim).toLocaleDateString('pt-BR') : '';
+      let diasBadge = '';
+      if (dias !== null) {
+        const cor = dias <= 30 ? '#fef2f2;color:#dc2626' : dias <= 60 ? '#fef9c3;color:#b45309' : '#f0fdf4;color:#16a34a';
+        diasBadge = `<span style="font-size:10px;background:${cor};padding:1px 7px;border-radius:4px;font-weight:700;white-space:nowrap">${dias}d restantes</span>`;
+      }
+
+      // Badge pagamento
+      const pago = finPagamentos.some(p => String(p.contratoId) === String(c.id));
+      let pagtoBadge = '';
+      if (!isPermuta && !isExcluido) {
+        if (pago) {
+          pagtoBadge = `<button class="pgto-btn pago" onclick="togglePagamento(event,${c.id},'${mesSelecionado}',true)">✅ Pago</button>`;
+        } else if (c.diaPagamento) {
+          const venc = new Date(anoMes, moMes - 1, c.diaPagamento);
+          const atrasado = hoje > venc && mesSelecionado <= fin_mesAtual();
+          pagtoBadge = atrasado
+            ? `<button class="pgto-btn atrasado" onclick="togglePagamento(event,${c.id},'${mesSelecionado}',false)">❗ Dia ${c.diaPagamento} — atrasado</button>`
+            : `<button class="pgto-btn pendente" onclick="togglePagamento(event,${c.id},'${mesSelecionado}',false)">⏰ Dia ${c.diaPagamento}</button>`;
+        } else {
+          pagtoBadge = `<button class="pgto-btn pendente" onclick="togglePagamento(event,${c.id},'${mesSelecionado}',false)">⏰ Marcar pago</button>`;
+        }
+      }
+
+      if (isPermuta || isExcluido) {
+        const badge = isPermuta
+          ? `<span style="font-size:10px;background:#fef3c7;color:#b45309;padding:1px 6px;border-radius:4px;font-weight:700">PERMUTA</span>`
+          : `<span style="font-size:10px;background:#fee2e2;color:#dc2626;padding:1px 6px;border-radius:4px;font-weight:700">EXCLUÍDO</span>`;
+        receitasRows += `
+          <div class="dre-row" style="opacity:.6">
+            <span class="dre-row-icon" style="font-size:10px;color:#94a3b8">—</span>
+            <span class="dre-row-label sub" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${c.empresaNome} ${badge} ${diasBadge}</span>
+            <span class="dre-row-value" style="color:#94a3b8">não contabilizado</span>
+            <span class="dre-row-actions"><button class="dre-action-btn" onclick="abrirModalContrato(${c.id})" title="Editar">✏️</button></span>
+          </div>`;
+      } else {
+        receitasRows += `
+          <div class="dre-row">
+            <span class="dre-row-icon" style="font-size:11px;color:#94a3b8">${num++}</span>
+            <span class="dre-row-label sub" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              ${c.empresaNome}${descontoTxt}
+              ${c.servico ? `<span style="font-size:10px;background:#ede9fe;color:#6366f1;padding:1px 7px;border-radius:4px;font-weight:700">${c.servico}</span>` : ''}
+              ${pagtoBadge}
+              ${diasBadge}
+              ${dataFimFmt ? `<span style="font-size:10px;color:#94a3b8">até ${dataFimFmt}</span>` : ''}
+            </span>
+            <span class="dre-row-value receita">${fin_brl(valor)}</span>
+            <span class="dre-row-actions"><button class="dre-action-btn" onclick="abrirModalContrato(${c.id})" title="Editar">✏️</button></span>
+          </div>`;
+      }
+    });
+
+    receitasExtra.forEach(l => {
+      receitasRows += `
+        <div class="dre-row">
+          <span class="dre-row-icon">➕</span>
+          <span class="dre-row-label sub">${l.descricao || 'Receita extra'}</span>
+          <span class="dre-row-value receita">${fin_brl(l.valor)}</span>
+          <span class="dre-row-actions">
+            <button class="dre-action-btn" onclick="abrirModalEditarLancamento(${l.id})" title="Editar">✏️</button>
+          </span>
+        </div>`;
+    });
+
+    // ─ DESPESAS agrupadas por categoria ─
+    let despesasRows = '';
+    Object.entries(FIN_CATEGORIAS).forEach(([key, cat]) => {
+      const itens = despesas.filter(d => d.categoria === key);
+      const subtotal = itens.reduce((s, d) => s + d.valor, 0);
+      if (itens.length === 0) return;
+
+      despesasRows += `
+        <div class="dre-row" style="background:#fafafa">
+          <span class="dre-row-icon">${cat.icon}</span>
+          <span class="dre-row-label" style="font-weight:700">${cat.label}</span>
+          <span class="dre-row-value despesa">${fin_brl(subtotal)}</span>
+          <span class="dre-row-actions"></span>
+        </div>`;
+      itens.forEach(l => {
+        despesasRows += `
+          <div class="dre-row">
+            <span class="dre-row-icon"></span>
+            <span class="dre-row-label sub">${l.descricao || '—'}</span>
+            <span class="dre-row-value despesa">${fin_brl(l.valor)}</span>
+            <span class="dre-row-actions">
+              <button class="dre-action-btn" onclick="abrirModalEditarLancamento(${l.id})" title="Editar">✏️</button>
+            </span>
+          </div>`;
+      });
+    });
+
+    const resClass = resultado >= 0 ? 'resultado-positivo' : 'resultado-negativo';
+    const resMargem = receitaTotal > 0 ? ` — margem ${((resultado/receitaTotal)*100).toFixed(1)}%` : '';
+
+    return `
+      <div class="dre-wrapper">
+        <div class="dre-section-header"><span>Receitas</span><span></span></div>
+        ${receitasRows}
+        <div class="dre-total receita-total"><span>= Receita Total</span><span>${fin_brl(receitaTotal)}</span></div>
+      </div>
+      <div class="dre-wrapper">
+        <div class="dre-section-header">
+          <span>Despesas</span>
+          <button class="fin-add-btn" style="padding:4px 10px;font-size:11px" onclick="abrirModalLancamento()">+ lançamento</button>
+        </div>
+        ${despesasRows || '<div class="dre-row"><span></span><span class="dre-row-label" style="color:#94a3b8">Nenhuma despesa cadastrada</span><span></span><span></span></div>'}
+        <div class="dre-total despesa-total"><span>= Total Despesas</span><span>${fin_brl(totalDespesas)}</span></div>
+      </div>
+      <div class="dre-wrapper">
+        <div class="dre-total ${resClass}"><span>= Resultado${resMargem}</span><span>${fin_brl(resultado)}</span></div>
+      </div>`;
+  }
+
+  function abrirModalLancamento(mes) {
+    document.getElementById('fin-modal-titulo').textContent = 'Novo Lançamento';
+    document.getElementById('fin-id').value = '';
+    document.getElementById('fin-mes').value = mes || document.getElementById('fin-mes-select')?.value || fin_mesAtual();
+    document.getElementById('fin-tipo').value = 'despesa';
+    document.getElementById('fin-categoria').value = 'folha';
+    document.getElementById('fin-descricao').value = '';
+    document.getElementById('fin-valor').value = '';
+    document.getElementById('fin-btn-delete').style.display = 'none';
+    fin_toggleCategoria();
+    document.getElementById('modal-fin').classList.remove('hidden');
+  }
+
+  function abrirModalEditarLancamento(id) {
+    const l = finLancamentos.find(x => x.id === id);
+    if (!l) return;
+    document.getElementById('fin-modal-titulo').textContent = 'Editar Lançamento';
+    document.getElementById('fin-id').value = l.id;
+    document.getElementById('fin-mes').value = l.mes;
+    document.getElementById('fin-tipo').value = l.tipo;
+    document.getElementById('fin-categoria').value = l.categoria || 'outras';
+    document.getElementById('fin-descricao').value = l.descricao;
+    document.getElementById('fin-valor').value = l.valor;
+    document.getElementById('fin-btn-delete').style.display = 'inline-block';
+    fin_toggleCategoria();
+    document.getElementById('modal-fin').classList.remove('hidden');
+  }
+
+  function fin_toggleCategoria() {
+    const tipo = document.getElementById('fin-tipo').value;
+    document.getElementById('fin-categoria-row').style.display = tipo === 'despesa' ? '' : 'none';
+  }
+
+  function fecharModalFin() {
+    document.getElementById('modal-fin').classList.add('hidden');
+  }
+
+  async function salvarLancamento() {
+    const id = document.getElementById('fin-id').value;
+    const valor = parseFloat(document.getElementById('fin-valor').value);
+    if (!valor || valor <= 0) { alert('Informe um valor válido.'); return; }
+    const payload = {
+      mes:       document.getElementById('fin-mes').value,
+      tipo:      document.getElementById('fin-tipo').value,
+      categoria: document.getElementById('fin-categoria').value,
+      descricao: document.getElementById('fin-descricao').value.trim(),
+      valor,
+    };
+    const url = id ? `/api/financeiro/${id}` : '/api/financeiro';
+    const method = id ? 'PATCH' : 'POST';
+    await fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    fecharModalFin();
+    carregarFinanceiro();
+  }
+
+  async function excluirLancamento() {
+    const id = document.getElementById('fin-id').value;
+    if (!id || !confirm('Excluir este lançamento?')) return;
+    await fetch(`/api/financeiro/${id}`, { method: 'DELETE' });
+    fecharModalFin();
+    carregarFinanceiro();
+  }
+
+  function abrirModalContrato(id) {
+    const c = finContratos.find(x => x.id === id);
+    if (!c) return;
+    document.getElementById('fin-contrato-titulo').textContent = c.empresaNome;
+    document.getElementById('fin-contrato-id').value = c.id;
+    document.getElementById('fin-contrato-servico').value = c.servico || 'Tráfego Pago';
+    document.getElementById('fin-contrato-valor').value = c.valorMensal || '';
+    document.getElementById('fin-contrato-inicio').value = c.dataInicio || '';
+    document.getElementById('fin-contrato-fim').value = c.dataFim || '';
+    document.getElementById('fin-contrato-dia').value = c.diaPagamento || '';
+    document.getElementById('modal-fin-contrato').classList.remove('hidden');
+  }
+
+  function fecharModalFinContrato() {
+    document.getElementById('modal-fin-contrato').classList.add('hidden');
+  }
+
+  async function salvarContratoFinanceiro() {
+    const id = document.getElementById('fin-contrato-id').value;
+    const diaRaw = document.getElementById('fin-contrato-dia').value;
+    const payload = {
+      servico:      document.getElementById('fin-contrato-servico').value,
+      valorMensal:  document.getElementById('fin-contrato-valor').value.trim(),
+      dataInicio:   document.getElementById('fin-contrato-inicio').value,
+      dataFim:      document.getElementById('fin-contrato-fim').value,
+      diaPagamento: diaRaw ? parseInt(diaRaw) : null,
+    };
+    if (!payload.valorMensal) { alert('Informe o valor do contrato.'); return; }
+    await fetch(`/api/contratos/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    fecharModalFinContrato();
+    const res = await fetch('/api/contratos');
+    finContratos = await res.json();
+    fin_renderizar(document.getElementById('fin-mes-select')?.value || fin_mesAtual());
+  }
+
+  async function togglePagamento(e, contratoId, mes, jaPago) {
+    e.stopPropagation();
+    if (jaPago) {
+      await fetch(`/api/pagamentos/${contratoId}/${mes}`, { method: 'DELETE' });
+    } else {
+      await fetch('/api/pagamentos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contratoId, mes }),
+      });
+    }
+    // Atualizar só os pagamentos e re-renderizar
+    const res = await fetch(`/api/pagamentos?mes=${mes}`);
+    finPagamentos = await res.json();
+    fin_renderizar(mes);
+  }
+
+  async function excluirContrato_fin() {
+    const id = document.getElementById('fin-contrato-id').value;
+    const nome = document.getElementById('fin-contrato-titulo').textContent;
+    if (!id || !confirm(`Excluir permanentemente o contrato de "${nome}"?`)) return;
+    await fetch(`/api/contratos/${id}`, { method: 'DELETE' });
+    fecharModalFinContrato();
+    const res = await fetch('/api/contratos');
+    finContratos = await res.json();
+    fin_renderizar(document.getElementById('fin-mes-select')?.value || fin_mesAtual());
+  }
+
+  function abrirModalNovoClienteFin() {
+    document.getElementById('fnc-nome').value = '';
+    document.getElementById('fnc-representante').value = '';
+    document.getElementById('fnc-valor').value = '';
+    document.getElementById('fnc-inicio').value = fin_mesAtual() + '-01';
+    document.getElementById('fnc-duracao').value = '6';
+    document.getElementById('modal-fin-novo-cliente').classList.remove('hidden');
+  }
+
+  async function salvarNovoClienteFin() {
+    const nome = document.getElementById('fnc-nome').value.trim();
+    const valor = document.getElementById('fnc-valor').value.trim();
+    const inicio = document.getElementById('fnc-inicio').value;
+    if (!nome || !valor || !inicio) { alert('Preencha nome, valor e data de início.'); return; }
+    const duracao = parseInt(document.getElementById('fnc-duracao').value);
+    await fetch('/api/contrato/registrar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        empresaNome: nome,
+        representanteNome: document.getElementById('fnc-representante').value.trim() || nome,
+        valorMensal: valor,
+        dataInicio: inicio,
+        duracao,
+        plano: `R$ ${valor}`,
+      }),
+    });
+    document.getElementById('modal-fin-novo-cliente').classList.add('hidden');
+    const res = await fetch('/api/contratos');
+    finContratos = await res.json();
+    fin_renderizar(document.getElementById('fin-mes-select')?.value || fin_mesAtual());
+  }
+
+  // ── GRÁFICO FINANCEIRO ─────────────────────────────────────
+
+  async function renderizarGrafico() {
+    const hoje = new Date();
+    const meses = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
+      meses.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+    }
+
+    // Buscar lançamentos de todos os meses em paralelo
+    const respostas = await Promise.all(meses.map(m => fetch(`/api/financeiro?mes=${m}`).then(r => r.json())));
+
+    const series = meses.map((mes, i) => {
+      const lancamentos = respostas[i];
+      // Contratos ativos neste mês
+      const [ano, mo] = mes.split('-').map(Number);
+      const primeiroDia = new Date(ano, mo - 1, 1);
+      const ultimoDia   = new Date(ano, mo, 0);
+      const contratosAtivos = finContratos.filter(c => {
+        if (!c.dataInicio) return false;
+        const ini = new Date(c.dataInicio);
+        const fim = c.dataFim ? new Date(c.dataFim) : new Date('2099-12-31');
+        return ini <= ultimoDia && fim >= primeiroDia && !c.excluirReceita && !c.permuta;
+      });
+      const faturamento = contratosAtivos.reduce((s, c) => s + fin_valorContrato(c), 0)
+        + lancamentos.filter(l => l.tipo === 'receita_extra').reduce((s, l) => s + l.valor, 0);
+      const despesas = lancamentos.filter(l => l.tipo === 'despesa').reduce((s, l) => s + l.valor, 0);
+      return { mes, faturamento, despesas, resultado: faturamento - despesas };
+    });
+
+    fin_desenharGrafico(series);
+  }
+
+  function fin_desenharGrafico(series) {
+    const svg = document.getElementById('fin-chart');
+    if (!svg) return;
+
+    const W = svg.parentElement.clientWidth || 640;
+    const H = 240;
+    const PAD = { top: 16, right: 20, bottom: 44, left: 72 };
+    const cW = W - PAD.left - PAD.right;
+    const cH = H - PAD.top - PAD.bottom;
+
+    const n = series.length;
+    const GROUP_W = cW / n;
+    const BAR_W = Math.min(GROUP_W * 0.28, 22);
+    const GAP = BAR_W * 0.3;
+
+    const allVals = series.flatMap(s => [s.faturamento, s.despesas, Math.max(s.resultado, 0)]);
+    const maxV = Math.max(...allVals, 1000);
+    const yOf = v => PAD.top + cH - (Math.max(v, 0) / maxV) * cH;
+    const barH = v => (Math.max(v, 0) / maxV) * cH;
+
+    // Grade horizontal
+    const gridLines = [0, 0.25, 0.5, 0.75, 1].map(p => {
+      const v = p * maxV;
+      const y = (PAD.top + cH - p * cH).toFixed(1);
+      const label = v >= 1000 ? `R$${(v/1000).toFixed(0)}k` : `R$${v.toFixed(0)}`;
+      return `<line x1="${PAD.left}" y1="${y}" x2="${W - PAD.right}" y2="${y}" stroke="#f1f5f9" stroke-width="1"/>
+              <text x="${PAD.left - 6}" y="${parseFloat(y) + 4}" text-anchor="end" font-size="10" fill="#94a3b8">${label}</text>`;
+    }).join('');
+
+    // Barras
+    const bars = series.map((s, i) => {
+      const cx = PAD.left + i * GROUP_W + GROUP_W / 2;
+      const x1 = cx - BAR_W - GAP;
+      const x2 = cx;
+      const x3 = cx + BAR_W + GAP;
+
+      const [ano, mo] = s.mes.split('-').map(Number);
+      const label = new Date(ano, mo - 1, 1).toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
+
+      const tip = (key, nome, val) =>
+        `onmouseenter="fin_showTip(event,'${label.toUpperCase()} — ${nome}: ${fin_brl(val)}')" onmouseleave="fin_hideTip()"`;
+
+      const resColor = s.resultado >= 0 ? '#818cf8' : '#f87171';
+
+      return `
+        <rect x="${x1.toFixed(1)}" y="${yOf(s.faturamento).toFixed(1)}" width="${BAR_W}" height="${barH(s.faturamento).toFixed(1)}" rx="3" fill="#34d399" ${tip('faturamento','Faturamento',s.faturamento)} style="cursor:default"/>
+        <rect x="${x2.toFixed(1)}" y="${yOf(s.despesas).toFixed(1)}"   width="${BAR_W}" height="${barH(s.despesas).toFixed(1)}"   rx="3" fill="#f87171" ${tip('despesas','Despesas',s.despesas)} style="cursor:default"/>
+        <rect x="${x3.toFixed(1)}" y="${yOf(s.resultado).toFixed(1)}"  width="${BAR_W}" height="${barH(s.resultado).toFixed(1)}"  rx="3" fill="${resColor}" ${tip('resultado','Resultado',s.resultado)} style="cursor:default"/>
+        <text x="${cx.toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="11" fill="#64748b" font-weight="600">${label}</text>`;
+    }).join('');
+
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.setAttribute('height', H);
+    svg.innerHTML = gridLines + bars;
+
+    document.getElementById('fin-chart-legenda').innerHTML = [
+      ['#34d399', 'Faturamento'],
+      ['#f87171', 'Despesas'],
+      ['#818cf8', 'Resultado'],
+    ].map(([cor, nome]) =>
+      `<span style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#334155">
+        <span style="width:12px;height:12px;border-radius:3px;background:${cor};display:inline-block"></span>${nome}
+      </span>`
+    ).join('');
+  }
+
+  let _chartTip = null;
+  function fin_showTip(e, texto) {
+    if (!_chartTip) { _chartTip = document.createElement('div'); _chartTip.className = 'chart-tooltip'; document.body.appendChild(_chartTip); }
+    _chartTip.textContent = texto;
+    _chartTip.style.display = 'block';
+    _chartTip.style.left = (e.clientX + 12) + 'px';
+    _chartTip.style.top  = (e.clientY - 10) + 'px';
+  }
+  function fin_hideTip() { if (_chartTip) _chartTip.style.display = 'none'; }
+
+  // ── USUÁRIOS ───────────────────────────────────────────────
+
+  async function carregarUsuarios() {
+    const res = await fetch('/api/usuarios');
+    usuariosData = await res.json();
+    const lista = document.getElementById('usuarios-lista');
+    lista.innerHTML = usuariosData.map(u => `
+      <div style="background:#fff;border-radius:12px;padding:16px 20px;border:1px solid #e2e8f0;display:flex;align-items:center;gap:16px;box-shadow:0 1px 3px rgba(0,0,0,.04)">
+        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0">${u.nome.charAt(0).toUpperCase()}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:700;color:#0f172a">${u.nome} ${u.admin ? '<span style="font-size:10px;background:#ede9fe;color:#6366f1;padding:1px 7px;border-radius:4px;font-weight:700">ADMIN</span>' : ''}</div>
+          <div style="font-size:12px;color:#94a3b8;margin-top:2px">@${u.usuario}</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px">${u.views.map(v => `<span style="font-size:10px;background:#f1f5f9;color:#64748b;padding:2px 7px;border-radius:4px;font-weight:600">${VIEWS_LABELS[v]||v}</span>`).join('')}</div>
+        </div>
+        <button class="dre-action-btn" style="opacity:1" onclick="abrirModalEditarUsuario('${u.usuario}')">✏️</button>
+      </div>`).join('');
+  }
+
+  function usr_montarViewsGrid(viewsSelecionadas) {
+    document.getElementById('usuario-views-grid').innerHTML = Object.entries(VIEWS_LABELS).map(([key, label]) =>
+      `<label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;cursor:pointer;padding:6px 10px;border-radius:7px;border:1.5px solid #e2e8f0;${viewsSelecionadas.includes(key)?'background:#ede9fe;border-color:#6366f1;color:#6366f1':'color:#64748b'}">
+        <input type="checkbox" value="${key}" ${viewsSelecionadas.includes(key)?'checked':''} style="accent-color:#6366f1" onchange="this.closest('label').style.cssText=this.checked?'display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;cursor:pointer;padding:6px 10px;border-radius:7px;border:1.5px solid #6366f1;background:#ede9fe;color:#6366f1':'display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;cursor:pointer;padding:6px 10px;border-radius:7px;border:1.5px solid #e2e8f0;color:#64748b'">
+        ${label}
+      </label>`
+    ).join('');
+  }
+
+  function abrirModalUsuario() {
+    document.getElementById('usuario-modal-titulo').textContent = 'Novo Usuário';
+    document.getElementById('usuario-id').value = '';
+    document.getElementById('usuario-login').value = '';
+    document.getElementById('usuario-login').disabled = false;
+    document.getElementById('usuario-nome').value = '';
+    document.getElementById('usuario-senha').value = '';
+    document.getElementById('usuario-senha-label').textContent = 'Senha *';
+    document.getElementById('usuario-admin').checked = false;
+    document.getElementById('usuario-btn-delete').style.display = 'none';
+    usr_montarViewsGrid(Object.keys(VIEWS_LABELS));
+    document.getElementById('modal-usuario').classList.remove('hidden');
+  }
+
+  function abrirModalEditarUsuario(login) {
+    const u = usuariosData.find(x => x.usuario === login);
+    if (!u) return;
+    document.getElementById('usuario-modal-titulo').textContent = 'Editar Usuário';
+    document.getElementById('usuario-id').value = u.usuario;
+    document.getElementById('usuario-login').value = u.usuario;
+    document.getElementById('usuario-login').disabled = true;
+    document.getElementById('usuario-nome').value = u.nome;
+    document.getElementById('usuario-senha').value = '';
+    document.getElementById('usuario-senha-label').textContent = 'Nova senha (deixe vazio para manter)';
+    document.getElementById('usuario-admin').checked = u.admin || false;
+    document.getElementById('usuario-btn-delete').style.display = u.usuario === ME.usuario ? 'none' : 'inline-block';
+    usr_montarViewsGrid(u.views || []);
+    document.getElementById('modal-usuario').classList.remove('hidden');
+  }
+
+  function fecharModalUsuario() {
+    document.getElementById('modal-usuario').classList.add('hidden');
+  }
+
+  async function salvarUsuario() {
+    const isEdit = !!document.getElementById('usuario-id').value;
+    const login  = document.getElementById('usuario-login').value.trim();
+    const nome   = document.getElementById('usuario-nome').value.trim();
+    const senha  = document.getElementById('usuario-senha').value;
+    const admin  = document.getElementById('usuario-admin').checked;
+    const views  = [...document.querySelectorAll('#usuario-views-grid input:checked')].map(i => i.value);
+
+    console.log('[salvarUsuario] isEdit:', isEdit, '| login:', login, '| nome:', nome, '| views:', views, '| admin:', admin);
+
+    if (!nome) { alert('Informe o nome.'); return; }
+    if (!isEdit && !login) { alert('Informe o login.'); return; }
+    if (!isEdit && !senha) { alert('Informe a senha.'); return; }
+    if (views.length === 0) { alert('Selecione pelo menos uma aba.'); return; }
+
+    const payload = { nome, views, admin };
+    if (senha) payload.senha = senha;
+    if (!isEdit) payload.usuario = login;
+
+    const url = isEdit ? `/api/usuarios/${login}` : '/api/usuarios';
+    const method = isEdit ? 'PATCH' : 'POST';
+    console.log('[salvarUsuario] enviando para', url, 'payload:', JSON.stringify(payload));
+    let res;
+    try {
+      res = await fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    } catch(e) {
+      alert('Erro de conexão: ' + e.message);
+      return;
+    }
+    console.log('[salvarUsuario] resposta status:', res.status);
+    if (!res.ok) {
+      let msg = `Erro ${res.status}`;
+      try { const e = await res.json(); msg = e.error || msg; } catch {}
+      alert('Erro ao salvar: ' + msg);
+      return;
+    }
+    fecharModalUsuario();
+    carregarUsuarios();
+  }
+
+  async function excluirUsuario() {
+    const login = document.getElementById('usuario-id').value;
+    if (!login || !confirm(`Excluir o usuário @${login}?`)) return;
+    await fetch(`/api/usuarios/${login}`, { method: 'DELETE' });
+    fecharModalUsuario();
+    carregarUsuarios();
+  }
+
+  // ── OPERAÇÕES ──────────────────────────────────────────────
+
+  async function carregarOperacoes() {
+    try {
+      const [opsRes, contRes, colRes] = await Promise.all([
+        fetch('/api/operacoes'),
+        fetch('/api/contratos'),
+        fetch('/api/operacoes-colunas'),
+      ]);
+      opsData = await opsRes.json();
+      opsContratosCache = await contRes.json();
+      opsColunas = await colRes.json();
+      ops_preencherSelectContrato();
+      ops_preencherSelectEtapa();
+      ops_renderizarKanban();
+    } catch(e) {
+      console.error('Erro ao carregar operações:', e);
+      alert('Erro ao carregar operações: ' + e.message);
+    }
+  }
+
+  function ops_preencherSelectEtapa() {
+    const sel = document.getElementById('ops-etapa');
+    if (!sel) return;
+    sel.innerHTML = opsColunas.map(c => `<option value="${c.key}">${c.label}</option>`).join('');
+  }
+
+  function ops_preencherSelectContrato() {
+    const sel = document.getElementById('ops-contrato-select');
+    if (!sel) return;
+    const opts = opsContratosCache
+      .filter(c => c.status === 'ativo')
+      .map(c => `<option value="${c.id}">${c.empresaNome}</option>`)
+      .join('');
+    sel.innerHTML = '<option value="">— selecione um contrato —</option>' + opts;
+  }
+
+  function ops_preencherContrato(id) {
+    if (!id) return;
+    const c = opsContratosCache.find(x => String(x.id) === String(id));
+    if (!c) return;
+    document.getElementById('ops-nome').value  = c.empresaNome || '';
+    document.getElementById('ops-cnpj').value  = c.empresaCnpj || '';
+    document.getElementById('ops-verba').value = c.valorMensal || '';
+  }
+
+  function ops_renderizarKanban() {
+    const container = document.getElementById('ops-kanban-container');
+    container.style.gridTemplateColumns = `repeat(${opsColunas.length}, 1fr)`;
+    container.innerHTML = opsColunas.map((col, i) => {
+      const cor = OPS_COL_COLORS[i % OPS_COL_COLORS.length];
+      const cards = opsData.filter(o => o.etapa === col.key);
+      const cardsHTML = cards.map(o => ops_cardHTML(o)).join('');
+      return `
+        <div class="ops-col" id="ops-col-${col.key}">
+          <div class="ops-col-header">
+            <span class="ops-col-title">${col.label}</span>
+            <span class="ops-col-count" style="background:${cor.bg};color:${cor.color}">${cards.length}</span>
+          </div>
+          <div class="ops-cards" id="ops-cards-${col.key}">${cardsHTML}</div>
+        </div>`;
+    }).join('');
+    ops_initDrop();
+  }
+
+  function ops_cardHTML(o) {
+    const ferrTags = (o.ferramentas || []).map(f => {
+      const cls = f === 'Meta' ? 'meta' : f === 'Google' ? 'google' : 'crm';
+      return `<span class="ops-tag ${cls}">${f}</span>`;
+    }).join('');
+    const equipeLabel = o.equipe === 'daniel' ? '🟡 Daniel & William' : '🟣 Felipe';
+    const equipeClass = o.equipe === 'daniel' ? 'equipe-daniel' : 'equipe-felipe';
+    const prazoTxt = o.prazo ? `📅 ${o.prazo}` : '';
+    const verbaTxt = o.verba ? `💰 R$ ${o.verba}` : '';
+    return `
+      <div class="ops-card ${equipeClass}"
+           draggable="true"
+           data-id="${o.id}"
+           ondragstart="ops_dragStart(event)"
+           ondragend="ops_dragEnd(event)"
+           onclick="abrirModalEditarOp(${o.id})">
+        <div class="ops-card-nome">${o.empresaNome}</div>
+        ${ferrTags ? `<div class="ops-card-tags">${ferrTags}</div>` : ''}
+        <div class="ops-card-info">
+          ${verbaTxt ? `<span>${verbaTxt}</span>` : ''}
+          ${prazoTxt ? `<span>${prazoTxt}</span>` : ''}
+        </div>
+        <span class="ops-card-equipe ${equipeClass}">${equipeLabel}</span>
+      </div>`;
+  }
+
+  function ops_dragStart(e) {
+    e.dataTransfer.setData('text/plain', e.currentTarget.dataset.id);
+    setTimeout(() => e.currentTarget.classList.add('dragging'), 0);
+  }
+
+  function ops_dragEnd(e) {
+    e.currentTarget.classList.remove('dragging');
+    document.querySelectorAll('.ops-col').forEach(c => c.classList.remove('drag-over'));
+  }
+
+  function ops_initDrop() {
+    document.querySelectorAll('.ops-col').forEach(col => {
+      const etapa = col.id.replace('ops-col-', '');
+      col.addEventListener('dragover', e => {
+        e.preventDefault();
+        col.classList.add('drag-over');
+      });
+      col.addEventListener('dragleave', e => {
+        if (!col.contains(e.relatedTarget)) col.classList.remove('drag-over');
+      });
+      col.addEventListener('drop', async e => {
+        e.preventDefault();
+        col.classList.remove('drag-over');
+        const id = e.dataTransfer.getData('text/plain');
+        if (!id) return;
+        await fetch(`/api/operacoes/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ etapa }),
+        });
+        carregarOperacoes();
+      });
+    });
+  }
+
+  function abrirModalNovaOp() {
+    document.getElementById('ops-modal-titulo').textContent = 'Novo cliente';
+    document.getElementById('ops-id').value = '';
+    document.getElementById('ops-nome').value = '';
+    document.getElementById('ops-cnpj').value = '';
+    document.getElementById('ops-verba').value = '';
+    document.getElementById('ops-prazo').value = '';
+    document.getElementById('ops-obs').value = '';
+    document.getElementById('ops-ferr-meta').checked = false;
+    document.getElementById('ops-ferr-google').checked = false;
+    document.getElementById('ops-ferr-crm').checked = false;
+    document.getElementById('ops-eq-felipe').checked = true;
+    document.getElementById('ops-etapa').value = 'onboarding';
+    document.getElementById('ops-contrato-select').value = '';
+    document.getElementById('ops-btn-delete').style.display = 'none';
+    ops_preencherSelectContrato();
+    document.getElementById('modal-ops').classList.remove('hidden');
+  }
+
+  function abrirModalEditarOp(id) {
+    const o = opsData.find(x => x.id === id);
+    if (!o) return;
+    document.getElementById('ops-modal-titulo').textContent = 'Editar cliente';
+    document.getElementById('ops-id').value = o.id;
+    document.getElementById('ops-nome').value = o.empresaNome || '';
+    document.getElementById('ops-cnpj').value = o.cnpj || '';
+    document.getElementById('ops-verba').value = o.verba || '';
+    document.getElementById('ops-prazo').value = o.prazo || '';
+    document.getElementById('ops-obs').value = o.obs || '';
+    document.getElementById('ops-ferr-meta').checked = (o.ferramentas || []).includes('Meta');
+    document.getElementById('ops-ferr-google').checked = (o.ferramentas || []).includes('Google');
+    document.getElementById('ops-ferr-crm').checked = (o.ferramentas || []).includes('CRM');
+    document.getElementById(o.equipe === 'daniel' ? 'ops-eq-daniel' : 'ops-eq-felipe').checked = true;
+    document.getElementById('ops-etapa').value = o.etapa || 'onboarding';
+    document.getElementById('ops-contrato-select').value = o.contratoId || '';
+    document.getElementById('ops-btn-delete').style.display = 'inline-block';
+    ops_preencherSelectContrato();
+    document.getElementById('modal-ops').classList.remove('hidden');
+  }
+
+  function fecharModalOps(e) {
+    if (e && e.target !== document.getElementById('modal-ops')) return;
+    document.getElementById('modal-ops').classList.add('hidden');
+  }
+
+  function fecharModalOpsForce() {
+    document.getElementById('modal-ops').classList.add('hidden');
+  }
+
+  async function salvarOp() {
+    const id = document.getElementById('ops-id').value;
+    const ferramentas = [];
+    if (document.getElementById('ops-ferr-meta').checked) ferramentas.push('Meta');
+    if (document.getElementById('ops-ferr-google').checked) ferramentas.push('Google');
+    if (document.getElementById('ops-ferr-crm').checked) ferramentas.push('CRM');
+    const equipe = document.querySelector('input[name="ops-equipe"]:checked').value;
+    const payload = {
+      empresaNome: document.getElementById('ops-nome').value.trim(),
+      cnpj:        document.getElementById('ops-cnpj').value.trim(),
+      ferramentas,
+      verba:       document.getElementById('ops-verba').value.trim(),
+      prazo:       document.getElementById('ops-prazo').value,
+      equipe,
+      etapa:       document.getElementById('ops-etapa').value,
+      obs:         document.getElementById('ops-obs').value.trim(),
+      contratoId:  document.getElementById('ops-contrato-select').value || null,
+    };
+    if (!payload.empresaNome) { alert('Informe o nome do cliente.'); return; }
+    const url = id ? `/api/operacoes/${id}` : '/api/operacoes';
+    const method = id ? 'PATCH' : 'POST';
+    await fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    fecharModalOpsForce();
+    carregarOperacoes();
+  }
+
+  // ── Gerenciar colunas ──────────────────────────────────
+
+  async function abrirModalGerenciarColunas() {
+    const res = await fetch('/api/operacoes-colunas');
+    opsColunas = await res.json();
+    const lista = document.getElementById('ops-colunas-lista');
+    lista.innerHTML = opsColunas.map((c, i) => ops_linhaColuna(c.key, c.label, i)).join('');
+    document.getElementById('modal-ops-colunas').classList.remove('hidden');
+  }
+
+  function ops_linhaColuna(key, label, idx) {
+    return `<div style="display:flex;gap:8px;align-items:center" data-col-key="${key}">
+      <input class="ops-col-input" value="${label}" placeholder="Nome da coluna"/>
+      <button class="ops-col-remove" onclick="this.closest('[data-col-key]').remove()" title="Remover">✕</button>
+    </div>`;
+  }
+
+  function ops_addLinhaColuna() {
+    const lista = document.getElementById('ops-colunas-lista');
+    const key = 'col_' + Date.now();
+    const div = document.createElement('div');
+    div.innerHTML = ops_linhaColuna(key, '', -1);
+    lista.appendChild(div.firstElementChild);
+    div.querySelector && lista.lastElementChild.querySelector('input').focus();
+  }
+
+  async function salvarColunas() {
+    const linhas = document.querySelectorAll('#ops-colunas-lista [data-col-key]');
+    const novas = [];
+    linhas.forEach(el => {
+      const key = el.dataset.colKey;
+      const label = el.querySelector('input').value.trim();
+      if (label) novas.push({ key, label });
+    });
+    if (novas.length === 0) { alert('Adicione pelo menos uma coluna.'); return; }
+    await fetch('/api/operacoes-colunas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(novas),
+    });
+    fecharModalColunas();
+    carregarOperacoes();
+  }
+
+  function fecharModalColunas() {
+    document.getElementById('modal-ops-colunas').classList.add('hidden');
+  }
+
+  async function excluirOp() {
+    const id = document.getElementById('ops-id').value;
+    if (!id || !confirm('Excluir este cliente do kanban?')) return;
+    await fetch(`/api/operacoes/${id}`, { method: 'DELETE' });
+    fecharModalOpsForce();
+    carregarOperacoes();
   }
 </script>
 

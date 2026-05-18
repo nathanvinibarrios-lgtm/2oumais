@@ -1,0 +1,48 @@
+[
+  {
+    "usuario": "nathan",
+    "nome": "Nathan",
+    "senhaHash": "3357c2400112ba5bfbfab677c0bfec258cc97efe0e614d38a35543960a476020",
+    "views": [
+      "campanhas",
+      "google",
+      "funil",
+      "crm",
+      "agenda",
+      "prospeccao",
+      "operacoes",
+      "financeiro",
+      "contratos"
+    ],
+    "admin": true
+  },
+  {
+    "usuario": "felipe",
+    "nome": "Felipe",
+    "senhaHash": "ec387c817f4ae8990e0b79cf4a447b689b9bda732dbda0d72cae9f1a5ea19395",
+    "views": [
+      "campanhas",
+      "google",
+      "funil",
+      "agenda",
+      "prospeccao",
+      "operacoes"
+    ],
+    "admin": false
+  },
+  {
+    "usuario": "bia",
+    "nome": "Bia",
+    "senhaHash": "b58721c03787632e9d279f9c9e49237ea7966e125d170742b911ae3f68c4c73c",
+    "views": [
+      "campanhas",
+      "google",
+      "funil",
+      "crm",
+      "agenda",
+      "prospeccao",
+      "operacoes",
+      "contratos"
+    ]
+  }
+]

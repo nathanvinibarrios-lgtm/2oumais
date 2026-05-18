@@ -1,6 +1,10 @@
 node_modules/
 .env
 .whatsapp-auth/
-data/
 qrcode.html
 *.log
+*.xlsx
+*.cpgz
+*.pdf
+lista-*
+mensagens-geradas.json
