@@ -1515,27 +1515,58 @@ _______________________________
 
   <!-- Modal nova/editar conta -->
   <div class="modal-overlay hidden" id="modal-trafego" onclick="if(event.target===this)trf_fecharModal()">
-    <div class="modal-box" style="width:440px;max-width:95vw" onclick="event.stopPropagation()">
+    <div class="modal-box" style="width:480px;max-width:95vw" onclick="event.stopPropagation()">
       <h4 id="trf-modal-titulo">Nova Conta</h4>
       <input type="hidden" id="trf-id"/>
       <div class="form-group" style="margin-bottom:10px">
         <label>Nome da conta / cliente *</label>
         <input type="text" id="trf-nome" placeholder="ex: Barbearia Rota 67"/>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+
+      <!-- Serviços -->
+      <div class="form-group" style="margin-bottom:12px">
+        <label style="display:block;margin-bottom:8px">Serviços contratados</label>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;cursor:pointer;padding:6px 12px;border-radius:8px;border:1.5px solid #e2e8f0" id="trf-srv-meta-label">
+            <input type="checkbox" id="trf-srv-meta" onchange="trf_toggleServicos()" style="accent-color:#6366f1"> 📊 Meta Ads
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;cursor:pointer;padding:6px 12px;border-radius:8px;border:1.5px solid #e2e8f0" id="trf-srv-google-label">
+            <input type="checkbox" id="trf-srv-google" onchange="trf_toggleServicos()" style="accent-color:#6366f1"> 🔍 Google Ads
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;cursor:pointer;padding:6px 12px;border-radius:8px;border:1.5px solid #e2e8f0" id="trf-srv-crm-label">
+            <input type="checkbox" id="trf-srv-crm" onchange="trf_toggleServicos()" style="accent-color:#6366f1"> 🤝 CRM
+          </label>
+        </div>
+      </div>
+
+      <!-- Saldos -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
         <div class="form-group">
           <label>Saldo atual (R$)</label>
-          <input type="number" id="trf-saldo" placeholder="0,00" step="0.01"/>
+          <input type="number" id="trf-saldo" placeholder="0" step="0.01"/>
         </div>
         <div class="form-group">
-          <label>Alerta saldo baixo (R$)</label>
+          <label>Saldo mensal (R$)</label>
+          <input type="number" id="trf-saldo-mensal" placeholder="0" step="0.01"/>
+        </div>
+        <div class="form-group">
+          <label>Alerta baixo (R$)</label>
           <input type="number" id="trf-saldo-alerta" placeholder="50" step="0.01"/>
         </div>
       </div>
-      <div class="form-group" style="margin-bottom:10px">
-        <label>Volume de leads (hoje)</label>
-        <input type="number" id="trf-leads" placeholder="0"/>
+
+      <!-- Metas de leads -->
+      <div id="trf-metas-leads" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <div class="form-group" id="trf-meta-meta-row">
+          <label>Meta leads Meta/dia</label>
+          <input type="number" id="trf-meta-meta" placeholder="0"/>
+        </div>
+        <div class="form-group" id="trf-meta-google-row">
+          <label>Meta leads Google/dia</label>
+          <input type="number" id="trf-meta-google" placeholder="0"/>
+        </div>
       </div>
+
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px">
         <button class="ops-delete-btn" id="trf-btn-delete" onclick="trf_excluir()" style="display:none">Excluir conta</button>
         <div class="modal-actions" style="flex:1;margin-top:0;margin-left:auto;max-width:260px">
@@ -1558,6 +1589,24 @@ _______________________________
       <div class="modal-actions" style="margin-top:0">
         <button class="modal-btn modal-btn-cancel" onclick="trf_fecharModalLog()">Cancelar</button>
         <button class="modal-btn modal-btn-ok" onclick="trf_salvarLog()">Registrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal justificativa leads abaixo da meta -->
+  <div class="modal-overlay hidden" id="modal-trafego-just" onclick="if(event.target===this)document.getElementById('modal-trafego-just').classList.add('hidden')">
+    <div class="modal-box" style="width:460px;max-width:95vw" onclick="event.stopPropagation()">
+      <h4>⚠️ Leads abaixo da meta</h4>
+      <input type="hidden" id="trf-just-conta-id"/>
+      <input type="hidden" id="trf-just-tipo"/>
+      <div style="font-size:13px;color:#64748b;margin-bottom:12px" id="trf-just-desc"></div>
+      <div class="form-group" style="margin-bottom:10px">
+        <label>O que foi feito para corrigir?</label>
+        <textarea id="trf-just-texto" rows="3" placeholder="ex: Aumentei o orçamento, ajustei o público alvo..." style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:10px;font-size:13px;resize:vertical;font-family:inherit"></textarea>
+      </div>
+      <div class="modal-actions" style="margin-top:0">
+        <button class="modal-btn modal-btn-cancel" onclick="document.getElementById('modal-trafego-just').classList.add('hidden')">Cancelar</button>
+        <button class="modal-btn modal-btn-ok" onclick="trf_salvarJustificativa()">Salvar</button>
       </div>
     </div>
   </div>
@@ -4038,19 +4087,25 @@ Posso te mostrar como? 😊</textarea>
   // ── TRÁFEGO PAGO ───────────────────────────────────────────
 
   const TRF_CHECKLIST = [
-    { key: 'cpl',     label: 'Verificar CPL' },
-    { key: 'orcamento', label: 'Ajustar orçamento' },
-    { key: 'leads',   label: 'Verificar volume de leads' },
-    { key: 'saldo',   label: 'Verificar saldo' },
+    { key: 'cpl',      label: 'Verificar CPL' },
+    { key: 'orcamento',label: 'Ajustar orçamento' },
+    { key: 'saldo',    label: 'Verificar saldo' },
   ];
 
   function trf_hoje() { return new Date().toISOString().slice(0,10); }
 
+  function trf_checklistDaConta(conta) {
+    const base = [...TRF_CHECKLIST];
+    if (conta.servicos?.meta)   base.push({ key: 'leads_meta',   label: 'Leads Meta' });
+    if (conta.servicos?.google) base.push({ key: 'leads_google', label: 'Leads Google' });
+    return base;
+  }
+
   function trf_status(conta) {
     const checks = conta.checklist?.[trf_hoje()] || {};
-    const total = TRF_CHECKLIST.length;
-    const feitos = TRF_CHECKLIST.filter(c => checks[c.key]).length;
-    if (feitos === total) return 'otimizado';
+    const lista = trf_checklistDaConta(conta);
+    const feitos = lista.filter(c => checks[c.key]).length;
+    if (feitos === lista.length) return 'otimizado';
     const ultima = conta.ultimaOtimizacao;
     if (ultima && ultima !== trf_hoje()) {
       const dias = Math.floor((Date.now() - new Date(ultima)) / 86400000);
@@ -4061,7 +4116,7 @@ Posso te mostrar como? 😊</textarea>
 
   function trf_diasSemLigar(conta) {
     if (!conta.ultimaLigacao) return 999;
-    return Math.floor((Date.now() - new Date(conta.ultimaLigacao)) / 86400000);
+    return Math.floor((Date.now() - new Date(conta.ultimaLigacao + 'T12:00:00')) / 86400000);
   }
 
   async function carregarTrafego() {
@@ -4093,13 +4148,32 @@ Posso te mostrar como? 😊</textarea>
       resumoDiv.style.display = 'none';
     }
 
-    // Cards
+    if (trfData.length === 0) {
+      container.innerHTML = `<div style="color:#94a3b8;font-size:14px;padding:20px">Nenhuma conta cadastrada. Clique em + Nova conta.</div>`;
+      return;
+    }
+
     container.innerHTML = trfData.map(conta => {
       const status = trf_status(conta);
       const checks = conta.checklist?.[hoje] || {};
       const diasLigar = trf_diasSemLigar(conta);
       const alertaLigacao = diasLigar >= 10;
-      const saldoBaixo = conta.saldo !== undefined && conta.saldoAlerta !== undefined && parseFloat(conta.saldo) <= parseFloat(conta.saldoAlerta);
+      const saldo = parseFloat(conta.saldo || 0);
+      const saldoMensal = parseFloat(conta.saldoMensal || 0);
+      const saldoAlerta = parseFloat(conta.saldoAlerta || 50);
+      const saldoBaixo = saldo <= saldoAlerta;
+      const srv = conta.servicos || {};
+      const checklist = trf_checklistDaConta(conta);
+
+      // Verifica leads abaixo da meta
+      const leadsMetaHoje = parseInt(checks.leads_meta_valor || 0);
+      const leadsGoogleHoje = parseInt(checks.leads_google_valor || 0);
+      const metaMeta = parseInt(conta.metaLeadsMeta || 0);
+      const metaGoogle = parseInt(conta.metaLeadsGoogle || 0);
+      const abaixoMeta = (srv.meta && metaMeta > 0 && leadsMetaHoje < metaMeta) ||
+                         (srv.google && metaGoogle > 0 && leadsGoogleHoje < metaGoogle);
+
+      const justHoje = (conta.justificativas || []).find(j => j.data === hoje);
 
       const statusCfg = {
         otimizado: { cor: '#16a34a', bg: '#dcfce7', label: '✅ Otimizado' },
@@ -4109,32 +4183,77 @@ Posso te mostrar como? 😊</textarea>
 
       const logsCard = (conta.logs || []).slice(-3).reverse();
 
+      // Badges de serviços
+      const srvBadges = [
+        srv.meta   ? `<span style="font-size:10px;background:#e0f2fe;color:#0369a1;padding:1px 7px;border-radius:4px;font-weight:700">📊 Meta</span>` : '',
+        srv.google ? `<span style="font-size:10px;background:#dcfce7;color:#16a34a;padding:1px 7px;border-radius:4px;font-weight:700">🔍 Google</span>` : '',
+        srv.crm    ? `<span style="font-size:10px;background:#f3e8ff;color:#7e22ce;padding:1px 7px;border-radius:4px;font-weight:700">🤝 CRM</span>` : '',
+      ].filter(Boolean).join('');
+
       return `
       <div style="background:#fff;border-radius:14px;border:2px solid ${statusCfg.cor}30;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden">
+
         <!-- Header -->
         <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f1f5f9">
           <div style="flex:1;min-width:0">
-            <div style="font-size:14px;font-weight:800;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${conta.nome}</div>
-            <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+            <div style="font-size:14px;font-weight:800;color:#0f172a">${conta.nome}</div>
+            <div style="margin-top:4px;display:flex;gap:5px;flex-wrap:wrap;align-items:center">
               <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:${statusCfg.bg};color:${statusCfg.cor}">${statusCfg.label}</span>
+              ${srvBadges}
               ${alertaLigacao ? `<span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:#fef3c7;color:#b45309">📞 Ligar! (${diasLigar}d)</span>` : ''}
               ${saldoBaixo ? `<span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:#ffe4e6;color:#be123c">⚠️ Saldo baixo</span>` : ''}
+              ${abaixoMeta && !justHoje ? `<span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:#ffe4e6;color:#be123c">📉 Abaixo da meta</span>` : ''}
             </div>
           </div>
           <button onclick="trf_abrirModalEditar('${conta.id}')" style="background:none;border:none;cursor:pointer;font-size:16px;padding:4px;color:#94a3b8">✏️</button>
         </div>
 
-        <!-- Métricas -->
+        <!-- Saldos -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid #f1f5f9">
           <div style="padding:10px 16px;border-right:1px solid #f1f5f9">
-            <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8;letter-spacing:.5px">Saldo</div>
-            <div style="font-size:16px;font-weight:800;color:${saldoBaixo?'#be123c':'#0f172a'};margin-top:2px">R$ ${parseFloat(conta.saldo||0).toFixed(2).replace('.',',')}</div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8;letter-spacing:.5px">Saldo atual</div>
+            <div style="font-size:16px;font-weight:800;color:${saldoBaixo?'#be123c':'#0f172a'};margin-top:2px">R$ ${saldo.toFixed(2).replace('.',',')}</div>
           </div>
           <div style="padding:10px 16px">
-            <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8;letter-spacing:.5px">Leads hoje</div>
-            <div style="font-size:16px;font-weight:800;color:#0f172a;margin-top:2px">${conta.leads || 0}</div>
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8;letter-spacing:.5px">Saldo mensal</div>
+            <div style="font-size:16px;font-weight:800;color:#0f172a;margin-top:2px">R$ ${saldoMensal.toFixed(2).replace('.',',')}</div>
           </div>
         </div>
+
+        <!-- Leads (só se tiver Meta ou Google) -->
+        ${(srv.meta || srv.google) ? `
+        <div style="border-bottom:1px solid #f1f5f9">
+          <div style="padding:8px 16px 4px;font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8;letter-spacing:.5px">Leads de hoje</div>
+          <div style="display:grid;grid-template-columns:${srv.meta && srv.google ? '1fr 1fr' : '1fr'};gap:0">
+            ${srv.meta ? `
+            <div style="padding:6px 16px 10px;${srv.google?'border-right:1px solid #f1f5f9':''}">
+              <div style="font-size:11px;color:#64748b;font-weight:600">📊 Meta ${metaMeta>0?`<span style="color:#94a3b8">(meta: ${metaMeta})</span>`:''}</div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+                <input type="number" value="${leadsMetaHoje}" min="0" onchange="trf_salvarLeads('${conta.id}','meta',this.value)"
+                  style="width:70px;border:1.5px solid #e2e8f0;border-radius:6px;padding:4px 8px;font-size:14px;font-weight:800;color:${metaMeta>0&&leadsMetaHoje<metaMeta?'#be123c':'#16a34a'}"/>
+                ${metaMeta>0&&leadsMetaHoje<metaMeta ? `<span style="font-size:11px;color:#be123c;font-weight:700">-${metaMeta-leadsMetaHoje} da meta</span>` : (metaMeta>0?`<span style="font-size:11px;color:#16a34a;font-weight:700">✅ Meta batida</span>`:'')}
+              </div>
+            </div>` : ''}
+            ${srv.google ? `
+            <div style="padding:6px 16px 10px">
+              <div style="font-size:11px;color:#64748b;font-weight:600">🔍 Google ${metaGoogle>0?`<span style="color:#94a3b8">(meta: ${metaGoogle})</span>`:''}</div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+                <input type="number" value="${leadsGoogleHoje}" min="0" onchange="trf_salvarLeads('${conta.id}','google',this.value)"
+                  style="width:70px;border:1.5px solid #e2e8f0;border-radius:6px;padding:4px 8px;font-size:14px;font-weight:800;color:${metaGoogle>0&&leadsGoogleHoje<metaGoogle?'#be123c':'#16a34a'}"/>
+                ${metaGoogle>0&&leadsGoogleHoje<metaGoogle ? `<span style="font-size:11px;color:#be123c;font-weight:700">-${metaGoogle-leadsGoogleHoje} da meta</span>` : (metaGoogle>0?`<span style="font-size:11px;color:#16a34a;font-weight:700">✅ Meta batida</span>`:'')}
+              </div>
+            </div>` : ''}
+          </div>
+          ${abaixoMeta ? `
+          <div style="padding:8px 16px;background:#fff7ed;border-top:1px solid #fed7aa">
+            ${justHoje
+              ? `<div style="font-size:12px;color:#92400e"><b>✍️ Ação tomada:</b> ${justHoje.texto}</div>`
+              : `<div style="display:flex;align-items:center;justify-content:space-between">
+                  <span style="font-size:12px;color:#b45309;font-weight:600">⚠️ Leads abaixo da meta — o que foi feito?</span>
+                  <button onclick="trf_abrirJustificativa('${conta.id}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:1.5px solid #b45309;color:#b45309;background:none;cursor:pointer">Justificar</button>
+                </div>`}
+          </div>` : ''}
+        </div>` : ''}
 
         <!-- Checklist -->
         <div style="padding:12px 16px;border-bottom:1px solid #f1f5f9">
@@ -4149,9 +4268,18 @@ Posso te mostrar como? 😊</textarea>
         </div>
 
         <!-- Ligação -->
-        <div style="padding:10px 16px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between">
-          <span style="font-size:12px;color:#64748b">📞 Última ligação: <b>${conta.ultimaLigacao ? new Date(conta.ultimaLigacao+'T00:00:00').toLocaleDateString('pt-BR') : 'nunca'}</b>${diasLigar < 999 ? ` (${diasLigar}d atrás)` : ''}</span>
-          <button onclick="trf_registrarLigacao('${conta.id}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:1.5px solid #6366f1;color:#6366f1;background:none;cursor:pointer">Liguei hoje</button>
+        <div style="padding:10px 16px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#94a3b8;letter-spacing:.5px">Última ligação</div>
+            <div style="font-size:13px;font-weight:700;color:${alertaLigacao?'#be123c':'#0f172a'};margin-top:2px">
+              ${conta.ultimaLigacao ? new Date(conta.ultimaLigacao+'T12:00:00').toLocaleDateString('pt-BR') : 'Nunca'}
+              ${diasLigar < 999 ? `<span style="font-size:11px;color:#94a3b8;font-weight:500"> — ${diasLigar}d atrás</span>` : ''}
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input type="date" id="trf-data-lig-${conta.id}" value="${conta.ultimaLigacao||''}" style="font-size:11px;border:1.5px solid #e2e8f0;border-radius:6px;padding:4px 6px;color:#334155"/>
+            <button onclick="trf_registrarLigacao('${conta.id}')" style="font-size:11px;font-weight:700;padding:5px 10px;border-radius:6px;border:1.5px solid #6366f1;color:#6366f1;background:none;cursor:pointer;white-space:nowrap">Salvar</button>
+          </div>
         </div>
 
         <!-- Log -->
@@ -4171,6 +4299,17 @@ Posso te mostrar como? 😊</textarea>
     }).join('');
   }
 
+  async function trf_salvarLeads(id, tipo, valor) {
+    const conta = trfData.find(c => String(c.id) === String(id));
+    if (!conta) return;
+    const hoje = trf_hoje();
+    if (!conta.checklist) conta.checklist = {};
+    if (!conta.checklist[hoje]) conta.checklist[hoje] = {};
+    conta.checklist[hoje][`leads_${tipo}_valor`] = parseInt(valor) || 0;
+    await fetch(`/api/trafego/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ checklist: conta.checklist }) });
+    trf_renderizar();
+  }
+
   async function trf_toggleCheck(id, chave, valor) {
     const conta = trfData.find(c => String(c.id) === String(id));
     if (!conta) return;
@@ -4178,18 +4317,58 @@ Posso te mostrar como? 😊</textarea>
     if (!conta.checklist) conta.checklist = {};
     if (!conta.checklist[hoje]) conta.checklist[hoje] = {};
     conta.checklist[hoje][chave] = valor;
-    // Verifica se completou tudo
-    const todosFeitos = TRF_CHECKLIST.every(c => conta.checklist[hoje][c.key]);
+    const lista = trf_checklistDaConta(conta);
+    const todosFeitos = lista.every(c => conta.checklist[hoje][c.key]);
     if (todosFeitos) conta.ultimaOtimizacao = hoje;
     await fetch(`/api/trafego/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ checklist: conta.checklist, ultimaOtimizacao: conta.ultimaOtimizacao }) });
     trf_renderizar();
   }
 
   async function trf_registrarLigacao(id) {
-    await fetch(`/api/trafego/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ ultimaLigacao: trf_hoje() }) });
+    const data = document.getElementById(`trf-data-lig-${id}`)?.value || trf_hoje();
+    await fetch(`/api/trafego/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ ultimaLigacao: data }) });
     const conta = trfData.find(c => String(c.id) === String(id));
-    if (conta) conta.ultimaLigacao = trf_hoje();
+    if (conta) conta.ultimaLigacao = data;
     trf_renderizar();
+  }
+
+  function trf_abrirJustificativa(id) {
+    const conta = trfData.find(c => String(c.id) === String(id));
+    if (!conta) return;
+    document.getElementById('trf-just-conta-id').value = id;
+    const srv = conta.servicos || {};
+    const checks = conta.checklist?.[trf_hoje()] || {};
+    const msgs = [];
+    if (srv.meta && parseInt(conta.metaLeadsMeta||0) > 0 && parseInt(checks.leads_meta_valor||0) < parseInt(conta.metaLeadsMeta||0))
+      msgs.push(`Meta Ads: ${checks.leads_meta_valor||0}/${conta.metaLeadsMeta} leads`);
+    if (srv.google && parseInt(conta.metaLeadsGoogle||0) > 0 && parseInt(checks.leads_google_valor||0) < parseInt(conta.metaLeadsGoogle||0))
+      msgs.push(`Google Ads: ${checks.leads_google_valor||0}/${conta.metaLeadsGoogle} leads`);
+    document.getElementById('trf-just-desc').textContent = msgs.join(' | ');
+    document.getElementById('trf-just-texto').value = '';
+    document.getElementById('modal-trafego-just').classList.remove('hidden');
+    setTimeout(() => document.getElementById('trf-just-texto').focus(), 100);
+  }
+
+  async function trf_salvarJustificativa() {
+    const id = document.getElementById('trf-just-conta-id').value;
+    const texto = document.getElementById('trf-just-texto').value.trim();
+    if (!texto) { alert('Descreva o que foi feito.'); return; }
+    const conta = trfData.find(c => String(c.id) === String(id));
+    if (!conta) return;
+    if (!conta.justificativas) conta.justificativas = [];
+    conta.justificativas = conta.justificativas.filter(j => j.data !== trf_hoje());
+    conta.justificativas.push({ data: trf_hoje(), texto });
+    await fetch(`/api/trafego/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ justificativas: conta.justificativas }) });
+    document.getElementById('modal-trafego-just').classList.add('hidden');
+    trf_renderizar();
+  }
+
+  function trf_toggleServicos() {
+    const meta   = document.getElementById('trf-srv-meta').checked;
+    const google = document.getElementById('trf-srv-google').checked;
+    document.getElementById('trf-meta-meta-row').style.display   = meta   ? '' : 'none';
+    document.getElementById('trf-meta-google-row').style.display = google ? '' : 'none';
+    document.getElementById('trf-metas-leads').style.display = (meta || google) ? '' : 'none';
   }
 
   function trf_abrirModalNova() {
@@ -4197,22 +4376,35 @@ Posso te mostrar como? 😊</textarea>
     document.getElementById('trf-id').value = '';
     document.getElementById('trf-nome').value = '';
     document.getElementById('trf-saldo').value = '';
+    document.getElementById('trf-saldo-mensal').value = '';
     document.getElementById('trf-saldo-alerta').value = '50';
-    document.getElementById('trf-leads').value = '';
+    document.getElementById('trf-meta-meta').value = '';
+    document.getElementById('trf-meta-google').value = '';
+    document.getElementById('trf-srv-meta').checked = false;
+    document.getElementById('trf-srv-google').checked = false;
+    document.getElementById('trf-srv-crm').checked = false;
     document.getElementById('trf-btn-delete').style.display = 'none';
+    trf_toggleServicos();
     document.getElementById('modal-trafego').classList.remove('hidden');
   }
 
   function trf_abrirModalEditar(id) {
     const conta = trfData.find(c => String(c.id) === String(id));
     if (!conta) return;
+    const srv = conta.servicos || {};
     document.getElementById('trf-modal-titulo').textContent = 'Editar Conta';
     document.getElementById('trf-id').value = conta.id;
     document.getElementById('trf-nome').value = conta.nome;
     document.getElementById('trf-saldo').value = conta.saldo || '';
+    document.getElementById('trf-saldo-mensal').value = conta.saldoMensal || '';
     document.getElementById('trf-saldo-alerta').value = conta.saldoAlerta || '50';
-    document.getElementById('trf-leads').value = conta.leads || '';
+    document.getElementById('trf-meta-meta').value = conta.metaLeadsMeta || '';
+    document.getElementById('trf-meta-google').value = conta.metaLeadsGoogle || '';
+    document.getElementById('trf-srv-meta').checked = !!srv.meta;
+    document.getElementById('trf-srv-google').checked = !!srv.google;
+    document.getElementById('trf-srv-crm').checked = !!srv.crm;
     document.getElementById('trf-btn-delete').style.display = 'inline-block';
+    trf_toggleServicos();
     document.getElementById('modal-trafego').classList.remove('hidden');
   }
 
@@ -4225,8 +4417,15 @@ Posso te mostrar como? 😊</textarea>
     const payload = {
       nome,
       saldo: document.getElementById('trf-saldo').value || '0',
+      saldoMensal: document.getElementById('trf-saldo-mensal').value || '0',
       saldoAlerta: document.getElementById('trf-saldo-alerta').value || '50',
-      leads: document.getElementById('trf-leads').value || '0',
+      metaLeadsMeta: document.getElementById('trf-meta-meta').value || '0',
+      metaLeadsGoogle: document.getElementById('trf-meta-google').value || '0',
+      servicos: {
+        meta:   document.getElementById('trf-srv-meta').checked,
+        google: document.getElementById('trf-srv-google').checked,
+        crm:    document.getElementById('trf-srv-crm').checked,
+      },
     };
     if (id) {
       await fetch(`/api/trafego/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
