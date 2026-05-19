@@ -10,6 +10,7 @@
       "crm",
       "agenda",
       "prospeccao",
+      "trafego",
       "operacoes",
       "financeiro",
       "contratos"
@@ -26,6 +27,7 @@
       "funil",
       "agenda",
       "prospeccao",
+      "trafego",
       "operacoes"
     ],
     "admin": false

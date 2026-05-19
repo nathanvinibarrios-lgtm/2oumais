@@ -13,5 +13,20 @@
     "etapa": "onboarding",
     "obs": "",
     "criadoEm": "2026-05-18T03:07:21.691Z"
+  },
+  {
+    "id": 1779110465856,
+    "contratoId": null,
+    "empresaNome": "José Italo / Doceria",
+    "cnpj": "",
+    "ferramentas": [
+      "Meta"
+    ],
+    "verba": "800",
+    "prazo": "2026-05-21",
+    "equipe": "felipe",
+    "etapa": "onboarding",
+    "obs": "instagram quase nao tem video.",
+    "criadoEm": "2026-05-18T13:21:05.856Z"
   }
 ]

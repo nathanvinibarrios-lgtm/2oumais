@@ -792,6 +792,9 @@
     </button>
 
     <div class="sidebar-section" style="margin-top:8px">Operacional</div>
+    <button class="sidebar-item" onclick="trocarView('trafego')" data-view="trafego">
+      <span class="sidebar-item-icon">📡</span> Tráfego Pago
+    </button>
     <button class="sidebar-item" onclick="trocarView('operacoes')" data-view="operacoes">
       <span class="sidebar-item-icon">⚙️</span> Operações
     </button>
@@ -1490,6 +1493,75 @@ _______________________________
 
   </div><!-- /view-financeiro -->
 
+  <!-- ── VIEW TRÁFEGO PAGO ──────────────────────────────── -->
+  <div class="view" id="view-trafego">
+    <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div>
+        <div class="page-title">📡 Tráfego Pago</div>
+        <div class="page-sub">Gestão diária das contas de anúncio</div>
+      </div>
+      <button class="btn-primary" onclick="trf_abrirModalNova()">+ Nova conta</button>
+    </div>
+
+    <!-- Resumo do dia -->
+    <div id="trf-resumo-dia" style="background:#fff;border-radius:14px;border:1px solid #e2e8f0;padding:18px 22px;margin-bottom:22px;display:none">
+      <div style="font-size:13px;font-weight:800;color:#0f172a;margin-bottom:12px">📋 Resumo do dia — <span id="trf-resumo-data"></span></div>
+      <div id="trf-resumo-lista" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+
+    <!-- Cards -->
+    <div id="trf-cards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px"></div>
+  </div><!-- /view-trafego -->
+
+  <!-- Modal nova/editar conta -->
+  <div class="modal-overlay hidden" id="modal-trafego" onclick="if(event.target===this)trf_fecharModal()">
+    <div class="modal-box" style="width:440px;max-width:95vw" onclick="event.stopPropagation()">
+      <h4 id="trf-modal-titulo">Nova Conta</h4>
+      <input type="hidden" id="trf-id"/>
+      <div class="form-group" style="margin-bottom:10px">
+        <label>Nome da conta / cliente *</label>
+        <input type="text" id="trf-nome" placeholder="ex: Barbearia Rota 67"/>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div class="form-group">
+          <label>Saldo atual (R$)</label>
+          <input type="number" id="trf-saldo" placeholder="0,00" step="0.01"/>
+        </div>
+        <div class="form-group">
+          <label>Alerta saldo baixo (R$)</label>
+          <input type="number" id="trf-saldo-alerta" placeholder="50" step="0.01"/>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:10px">
+        <label>Volume de leads (hoje)</label>
+        <input type="number" id="trf-leads" placeholder="0"/>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px">
+        <button class="ops-delete-btn" id="trf-btn-delete" onclick="trf_excluir()" style="display:none">Excluir conta</button>
+        <div class="modal-actions" style="flex:1;margin-top:0;margin-left:auto;max-width:260px">
+          <button class="modal-btn modal-btn-cancel" onclick="trf_fecharModal()">Cancelar</button>
+          <button class="modal-btn modal-btn-ok" onclick="trf_salvar()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal log de atividade -->
+  <div class="modal-overlay hidden" id="modal-trafego-log" onclick="if(event.target===this)trf_fecharModalLog()">
+    <div class="modal-box" style="width:480px;max-width:95vw" onclick="event.stopPropagation()">
+      <h4 id="trf-log-titulo">📝 Registrar atividade</h4>
+      <input type="hidden" id="trf-log-conta-id"/>
+      <div class="form-group" style="margin-bottom:10px">
+        <label>O que foi feito?</label>
+        <textarea id="trf-log-texto" rows="3" placeholder="ex: Aumentei orçamento de R$50 para R$80, CPL estava alto" style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:10px;font-size:13px;resize:vertical;font-family:inherit"></textarea>
+      </div>
+      <div class="modal-actions" style="margin-top:0">
+        <button class="modal-btn modal-btn-cancel" onclick="trf_fecharModalLog()">Cancelar</button>
+        <button class="modal-btn modal-btn-ok" onclick="trf_salvarLog()">Registrar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ── VIEW OPERAÇÕES ────────────────────────────────── -->
   <div class="view" id="view-operacoes">
     <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
@@ -1890,6 +1962,9 @@ Posso te mostrar como? 😊</textarea>
     outras:         { label: 'Outras Despesas',          icon: '📦' },
   };
 
+  // Tráfego Pago
+  let trfData = [];
+
   // Usuários
   let usuariosData = [];
   const VIEWS_LABELS = {
@@ -1899,6 +1974,7 @@ Posso te mostrar como? 😊</textarea>
     crm:        '🤝 CRM',
     agenda:     '📅 Agenda',
     prospeccao: '🚀 Prospecção',
+    trafego:    '📡 Tráfego Pago',
     operacoes:  '⚙️ Operações',
     financeiro: '💰 Financeiro',
     contratos:  '📄 Contratos',
@@ -2348,7 +2424,9 @@ Posso te mostrar como? 😊</textarea>
     });
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById('view-' + view).classList.add('active');
-    if (view === 'usuarios') {
+    if (view === 'trafego') {
+      carregarTrafego();
+    } else if (view === 'usuarios') {
       carregarUsuarios();
     } else if (view === 'financeiro') {
       iniciarFinanceiro();
@@ -3956,6 +4034,241 @@ Posso te mostrar como? 😊</textarea>
     _chartTip.style.top  = (e.clientY - 10) + 'px';
   }
   function fin_hideTip() { if (_chartTip) _chartTip.style.display = 'none'; }
+
+  // ── TRÁFEGO PAGO ───────────────────────────────────────────
+
+  const TRF_CHECKLIST = [
+    { key: 'cpl',     label: 'Verificar CPL' },
+    { key: 'orcamento', label: 'Ajustar orçamento' },
+    { key: 'leads',   label: 'Verificar volume de leads' },
+    { key: 'saldo',   label: 'Verificar saldo' },
+  ];
+
+  function trf_hoje() { return new Date().toISOString().slice(0,10); }
+
+  function trf_status(conta) {
+    const checks = conta.checklist?.[trf_hoje()] || {};
+    const total = TRF_CHECKLIST.length;
+    const feitos = TRF_CHECKLIST.filter(c => checks[c.key]).length;
+    if (feitos === total) return 'otimizado';
+    const ultima = conta.ultimaOtimizacao;
+    if (ultima && ultima !== trf_hoje()) {
+      const dias = Math.floor((Date.now() - new Date(ultima)) / 86400000);
+      if (dias >= 2) return 'atrasado';
+    }
+    return 'pendente';
+  }
+
+  function trf_diasSemLigar(conta) {
+    if (!conta.ultimaLigacao) return 999;
+    return Math.floor((Date.now() - new Date(conta.ultimaLigacao)) / 86400000);
+  }
+
+  async function carregarTrafego() {
+    const res = await fetch('/api/trafego');
+    trfData = await res.json();
+    trf_renderizar();
+  }
+
+  function trf_renderizar() {
+    const container = document.getElementById('trf-cards');
+    const hoje = trf_hoje();
+
+    // Resumo do dia
+    const logsHoje = trfData.flatMap(c =>
+      (c.logs || []).filter(l => l.data.startsWith(hoje)).map(l => ({ conta: c.nome, texto: l.texto, hora: l.data }))
+    ).sort((a,b) => b.hora.localeCompare(a.hora));
+
+    const resumoDiv = document.getElementById('trf-resumo-dia');
+    if (logsHoje.length > 0) {
+      resumoDiv.style.display = 'block';
+      document.getElementById('trf-resumo-data').textContent = new Date().toLocaleDateString('pt-BR');
+      document.getElementById('trf-resumo-lista').innerHTML = logsHoje.map(l => `
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #f1f5f9">
+          <span style="font-size:11px;color:#94a3b8;white-space:nowrap;padding-top:1px">${new Date(l.hora).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</span>
+          <span style="font-size:12px;font-weight:700;color:#6366f1;white-space:nowrap">${l.conta}</span>
+          <span style="font-size:12px;color:#334155;flex:1">${l.texto}</span>
+        </div>`).join('');
+    } else {
+      resumoDiv.style.display = 'none';
+    }
+
+    // Cards
+    container.innerHTML = trfData.map(conta => {
+      const status = trf_status(conta);
+      const checks = conta.checklist?.[hoje] || {};
+      const diasLigar = trf_diasSemLigar(conta);
+      const alertaLigacao = diasLigar >= 10;
+      const saldoBaixo = conta.saldo !== undefined && conta.saldoAlerta !== undefined && parseFloat(conta.saldo) <= parseFloat(conta.saldoAlerta);
+
+      const statusCfg = {
+        otimizado: { cor: '#16a34a', bg: '#dcfce7', label: '✅ Otimizado' },
+        pendente:  { cor: '#b45309', bg: '#fef9c3', label: '⏳ Pendente' },
+        atrasado:  { cor: '#be123c', bg: '#ffe4e6', label: '🔴 Atrasado' },
+      }[status];
+
+      const logsCard = (conta.logs || []).slice(-3).reverse();
+
+      return `
+      <div style="background:#fff;border-radius:14px;border:2px solid ${statusCfg.cor}30;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden">
+        <!-- Header -->
+        <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f1f5f9">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:800;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${conta.nome}</div>
+            <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+              <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:${statusCfg.bg};color:${statusCfg.cor}">${statusCfg.label}</span>
+              ${alertaLigacao ? `<span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:#fef3c7;color:#b45309">📞 Ligar! (${diasLigar}d)</span>` : ''}
+              ${saldoBaixo ? `<span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:#ffe4e6;color:#be123c">⚠️ Saldo baixo</span>` : ''}
+            </div>
+          </div>
+          <button onclick="trf_abrirModalEditar('${conta.id}')" style="background:none;border:none;cursor:pointer;font-size:16px;padding:4px;color:#94a3b8">✏️</button>
+        </div>
+
+        <!-- Métricas -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid #f1f5f9">
+          <div style="padding:10px 16px;border-right:1px solid #f1f5f9">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8;letter-spacing:.5px">Saldo</div>
+            <div style="font-size:16px;font-weight:800;color:${saldoBaixo?'#be123c':'#0f172a'};margin-top:2px">R$ ${parseFloat(conta.saldo||0).toFixed(2).replace('.',',')}</div>
+          </div>
+          <div style="padding:10px 16px">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8;letter-spacing:.5px">Leads hoje</div>
+            <div style="font-size:16px;font-weight:800;color:#0f172a;margin-top:2px">${conta.leads || 0}</div>
+          </div>
+        </div>
+
+        <!-- Checklist -->
+        <div style="padding:12px 16px;border-bottom:1px solid #f1f5f9">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#94a3b8;letter-spacing:.5px;margin-bottom:8px">Checklist de hoje</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            ${TRF_CHECKLIST.map(c => `
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:600;color:${checks[c.key]?'#16a34a':'#475569'}">
+                <input type="checkbox" ${checks[c.key]?'checked':''} onchange="trf_toggleCheck('${conta.id}','${c.key}',this.checked)" style="width:15px;height:15px;accent-color:#16a34a;cursor:pointer">
+                <span style="${checks[c.key]?'text-decoration:line-through;opacity:.6':''}"> ${c.label}</span>
+              </label>`).join('')}
+          </div>
+        </div>
+
+        <!-- Ligação -->
+        <div style="padding:10px 16px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:12px;color:#64748b">📞 Última ligação: <b>${conta.ultimaLigacao ? new Date(conta.ultimaLigacao+'T00:00:00').toLocaleDateString('pt-BR') : 'nunca'}</b>${diasLigar < 999 ? ` (${diasLigar}d atrás)` : ''}</span>
+          <button onclick="trf_registrarLigacao('${conta.id}')" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;border:1.5px solid #6366f1;color:#6366f1;background:none;cursor:pointer">Liguei hoje</button>
+        </div>
+
+        <!-- Log -->
+        <div style="padding:12px 16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:#94a3b8;letter-spacing:.5px">Atividades recentes</div>
+            <button onclick="trf_abrirModalLog('${conta.id}')" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;border:1.5px solid #e2e8f0;color:#6366f1;background:none;cursor:pointer">+ Registrar</button>
+          </div>
+          ${logsCard.length === 0 ? `<div style="font-size:12px;color:#94a3b8;font-style:italic">Nenhuma atividade registrada.</div>` :
+            logsCard.map(l => `
+              <div style="font-size:12px;padding:5px 0;border-bottom:1px solid #f8fafc;display:flex;gap:8px">
+                <span style="color:#94a3b8;white-space:nowrap;font-size:11px">${new Date(l.data).toLocaleDateString('pt-BR')}</span>
+                <span style="color:#334155;flex:1">${l.texto}</span>
+              </div>`).join('')}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  async function trf_toggleCheck(id, chave, valor) {
+    const conta = trfData.find(c => String(c.id) === String(id));
+    if (!conta) return;
+    const hoje = trf_hoje();
+    if (!conta.checklist) conta.checklist = {};
+    if (!conta.checklist[hoje]) conta.checklist[hoje] = {};
+    conta.checklist[hoje][chave] = valor;
+    // Verifica se completou tudo
+    const todosFeitos = TRF_CHECKLIST.every(c => conta.checklist[hoje][c.key]);
+    if (todosFeitos) conta.ultimaOtimizacao = hoje;
+    await fetch(`/api/trafego/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ checklist: conta.checklist, ultimaOtimizacao: conta.ultimaOtimizacao }) });
+    trf_renderizar();
+  }
+
+  async function trf_registrarLigacao(id) {
+    await fetch(`/api/trafego/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ ultimaLigacao: trf_hoje() }) });
+    const conta = trfData.find(c => String(c.id) === String(id));
+    if (conta) conta.ultimaLigacao = trf_hoje();
+    trf_renderizar();
+  }
+
+  function trf_abrirModalNova() {
+    document.getElementById('trf-modal-titulo').textContent = 'Nova Conta';
+    document.getElementById('trf-id').value = '';
+    document.getElementById('trf-nome').value = '';
+    document.getElementById('trf-saldo').value = '';
+    document.getElementById('trf-saldo-alerta').value = '50';
+    document.getElementById('trf-leads').value = '';
+    document.getElementById('trf-btn-delete').style.display = 'none';
+    document.getElementById('modal-trafego').classList.remove('hidden');
+  }
+
+  function trf_abrirModalEditar(id) {
+    const conta = trfData.find(c => String(c.id) === String(id));
+    if (!conta) return;
+    document.getElementById('trf-modal-titulo').textContent = 'Editar Conta';
+    document.getElementById('trf-id').value = conta.id;
+    document.getElementById('trf-nome').value = conta.nome;
+    document.getElementById('trf-saldo').value = conta.saldo || '';
+    document.getElementById('trf-saldo-alerta').value = conta.saldoAlerta || '50';
+    document.getElementById('trf-leads').value = conta.leads || '';
+    document.getElementById('trf-btn-delete').style.display = 'inline-block';
+    document.getElementById('modal-trafego').classList.remove('hidden');
+  }
+
+  function trf_fecharModal() { document.getElementById('modal-trafego').classList.add('hidden'); }
+
+  async function trf_salvar() {
+    const id = document.getElementById('trf-id').value;
+    const nome = document.getElementById('trf-nome').value.trim();
+    if (!nome) { alert('Informe o nome da conta.'); return; }
+    const payload = {
+      nome,
+      saldo: document.getElementById('trf-saldo').value || '0',
+      saldoAlerta: document.getElementById('trf-saldo-alerta').value || '50',
+      leads: document.getElementById('trf-leads').value || '0',
+    };
+    if (id) {
+      await fetch(`/api/trafego/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    } else {
+      await fetch('/api/trafego', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    }
+    trf_fecharModal();
+    carregarTrafego();
+  }
+
+  async function trf_excluir() {
+    const id = document.getElementById('trf-id').value;
+    if (!id || !confirm('Excluir esta conta?')) return;
+    await fetch(`/api/trafego/${id}`, { method:'DELETE' });
+    trf_fecharModal();
+    carregarTrafego();
+  }
+
+  function trf_abrirModalLog(id) {
+    const conta = trfData.find(c => String(c.id) === String(id));
+    if (!conta) return;
+    document.getElementById('trf-log-titulo').textContent = `📝 ${conta.nome}`;
+    document.getElementById('trf-log-conta-id').value = id;
+    document.getElementById('trf-log-texto').value = '';
+    document.getElementById('modal-trafego-log').classList.remove('hidden');
+    setTimeout(() => document.getElementById('trf-log-texto').focus(), 100);
+  }
+
+  function trf_fecharModalLog() { document.getElementById('modal-trafego-log').classList.add('hidden'); }
+
+  async function trf_salvarLog() {
+    const id = document.getElementById('trf-log-conta-id').value;
+    const texto = document.getElementById('trf-log-texto').value.trim();
+    if (!texto) { alert('Escreva o que foi feito.'); return; }
+    const conta = trfData.find(c => String(c.id) === String(id));
+    if (!conta) return;
+    if (!conta.logs) conta.logs = [];
+    conta.logs.push({ data: new Date().toISOString(), texto });
+    await fetch(`/api/trafego/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ logs: conta.logs }) });
+    trf_fecharModalLog();
+    trf_renderizar();
+  }
 
   // ── USUÁRIOS ───────────────────────────────────────────────
 

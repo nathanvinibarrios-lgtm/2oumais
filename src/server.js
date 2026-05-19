@@ -1162,6 +1162,41 @@ app.delete("/api/pagamentos/:contratoId/:mes", autenticado, (req, res) => {
   res.json({ ok: true });
 });
 
+// ── Tráfego Pago ───────────────────────────────────────────
+const TRAFEGO_FILE = path.join(__dirname, "../data/trafego.json");
+function lerTrafego() {
+  try { if (fs.existsSync(TRAFEGO_FILE)) return JSON.parse(fs.readFileSync(TRAFEGO_FILE, "utf8")); } catch {}
+  return [];
+}
+function salvarTrafego(lista) {
+  fs.mkdirSync(path.dirname(TRAFEGO_FILE), { recursive: true });
+  fs.writeFileSync(TRAFEGO_FILE, JSON.stringify(lista, null, 2));
+}
+
+app.get("/api/trafego", autenticado, (_req, res) => res.json(lerTrafego()));
+
+app.post("/api/trafego", autenticado, (req, res) => {
+  const lista = lerTrafego();
+  const nova = { id: Date.now(), ...req.body, criadoEm: new Date().toISOString() };
+  lista.push(nova);
+  salvarTrafego(lista);
+  res.json(nova);
+});
+
+app.patch("/api/trafego/:id", autenticado, (req, res) => {
+  const lista = lerTrafego();
+  const idx = lista.findIndex(c => String(c.id) === req.params.id);
+  if (idx < 0) return res.status(404).json({ error: "não encontrado" });
+  Object.assign(lista[idx], req.body);
+  salvarTrafego(lista);
+  res.json(lista[idx]);
+});
+
+app.delete("/api/trafego/:id", autenticado, (req, res) => {
+  salvarTrafego(lerTrafego().filter(c => String(c.id) !== req.params.id));
+  res.json({ ok: true });
+});
+
 app.listen(PORT, async () => {
   console.log(`\nDashboard: http://localhost:${PORT}\n`);
   await coletarTodos();
