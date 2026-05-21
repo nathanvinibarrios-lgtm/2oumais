@@ -6,23 +6,41 @@ const fs = require("fs");
 const session = require("express-session");
 const { gerarDocx, gerarPDF } = require("./contrato");
 
-const CONVERSOES_FILE  = path.join(__dirname, "../data/conversoes.json");
-const CONTRATOS_FILE   = path.join(__dirname, "../data/contratos.json");
-const OPERACOES_FILE         = path.join(__dirname, "../data/operacoes.json");
-const OPERACOES_COLUNAS_FILE = path.join(__dirname, "../data/operacoes-colunas.json");
-const FINANCEIRO_FILE        = path.join(__dirname, "../data/financeiro.json");
-const PAGAMENTOS_FILE        = path.join(__dirname, "../data/pagamentos.json");
+// Usa disco persistente em produção (/data) ou pasta local em dev
+const DATA_DIR = fs.existsSync("/data") ? "/data" : path.join(__dirname, "../data");
+
+// Copia arquivos iniciais do git para o disco persistente (apenas se não existirem)
+if (fs.existsSync("/data")) {
+  const SEED_DIR = path.join(__dirname, "../data");
+  fs.mkdirSync("/data", { recursive: true });
+  if (fs.existsSync(SEED_DIR)) {
+    for (const file of fs.readdirSync(SEED_DIR)) {
+      const dest = path.join("/data", file);
+      if (!fs.existsSync(dest)) {
+        fs.copyFileSync(path.join(SEED_DIR, file), dest);
+        console.log(`[init] copiado ${file} para disco persistente`);
+      }
+    }
+  }
+}
+
+const CONVERSOES_FILE  = path.join(DATA_DIR, "conversoes.json");
+const CONTRATOS_FILE   = path.join(DATA_DIR, "contratos.json");
+const OPERACOES_FILE         = path.join(DATA_DIR, "operacoes.json");
+const OPERACOES_COLUNAS_FILE = path.join(DATA_DIR, "operacoes-colunas.json");
+const FINANCEIRO_FILE        = path.join(DATA_DIR, "financeiro.json");
+const PAGAMENTOS_FILE        = path.join(DATA_DIR, "pagamentos.json");
 
 const DEFAULT_OPERACOES_COLUNAS = [
   { key: "onboarding", label: "Onboarding / Briefing" },
   { key: "criativos",  label: "Criativos + Planejamento" },
   { key: "ativo",      label: "Ativo" },
 ];
-const TEMPLATE_FILE    = path.join(__dirname, "../data/template-contrato.txt");
-const CRM_FILE         = path.join(__dirname, "../data/crm.json");
-const CRM_CONFIG_FILE  = path.join(__dirname, "../data/crm-config.json");
-const FUNIL_CONFIG_FILE= path.join(__dirname, "../data/funil-config.json");
-const AGENDA_FILE      = path.join(__dirname, "../data/agenda.json");
+const TEMPLATE_FILE    = path.join(DATA_DIR, "template-contrato.txt");
+const CRM_FILE         = path.join(DATA_DIR, "crm.json");
+const CRM_CONFIG_FILE  = path.join(DATA_DIR, "crm-config.json");
+const FUNIL_CONFIG_FILE= path.join(DATA_DIR, "funil-config.json");
+const AGENDA_FILE      = path.join(DATA_DIR, "agenda.json");
 
 const DEFAULT_CRM_COLUNAS = [
   { key: "novo",     label: "Novo Lead"         },
@@ -110,7 +128,7 @@ const CPL_LIMITE = parseFloat(process.env.CPL_LIMITE || "50");
 const DRY_RUN = process.env.DRY_RUN === "true";
 const INTERVALO_MS = 5 * 60 * 1000;
 const SESSION_SECRET = process.env.SESSION_SECRET || "secret_padrao_troque";
-const USERS_FILE = path.join(__dirname, "../data/users.json");
+const USERS_FILE = path.join(DATA_DIR, "users.json");
 
 const crypto = require("crypto");
 function hashSenha(s) { return crypto.createHash("sha256").update(s).digest("hex"); }
@@ -1163,7 +1181,7 @@ app.delete("/api/pagamentos/:contratoId/:mes", autenticado, (req, res) => {
 });
 
 // ── Tráfego Pago ───────────────────────────────────────────
-const TRAFEGO_FILE = path.join(__dirname, "../data/trafego.json");
+const TRAFEGO_FILE = path.join(DATA_DIR, "trafego.json");
 function lerTrafego() {
   try { if (fs.existsSync(TRAFEGO_FILE)) return JSON.parse(fs.readFileSync(TRAFEGO_FILE, "utf8")); } catch {}
   return [];
