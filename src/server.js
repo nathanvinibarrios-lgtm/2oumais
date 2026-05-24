@@ -288,8 +288,9 @@ async function coletarDados(dias) {
 
     console.log(`[${new Date().toLocaleTimeString("pt-BR")}] OK ${dias}d — ${resultados.length} campanhas, ${todosAnuncios.length} anúncios`);
   } catch (err) {
-    if (caches[dias]) caches[dias].erro = err?.response?.data?.error?.message || err.message;
-    console.error(`[ERRO ${dias}d] ${err.message}`);
+    const msg = err?.response?.data?.error?.message || err.message;
+    caches[dias] = { erro: msg, campanhas: [], anuncios: [], resumo: {}, atualizadoEm: new Date().toISOString(), periodo: dias };
+    console.error(`[ERRO ${dias}d] ${msg}`);
   }
 }
 
