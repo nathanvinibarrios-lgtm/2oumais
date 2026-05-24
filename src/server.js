@@ -594,6 +594,15 @@ app.get("/api/campanhas", autenticado, (req, res) => {
   res.json(cache);
 });
 
+app.post("/api/campanhas/recarregar", autenticado, async (req, res) => {
+  try {
+    await coletarTodos();
+    res.json({ ok: true });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // Contratos — geração
 function registrarContrato(dados) {
   try {
